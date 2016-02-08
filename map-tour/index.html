@@ -45,8 +45,6 @@
         center: [-101.17, 21, 78]
       });
 	  
-	  console.log(view);
-	  
 	  var qTask = new QueryTask({
 		url: "https://services.arcgis.com/Wl7Y1m92PbjtJs5n/arcgis/rest/services/3DRoutes/FeatureServer/0"
 	  });
@@ -72,7 +70,7 @@
 		}*/
 		setTimeout(function() {
 			animateRoute();
-		}, 1000);
+		}, 2000);
 	  }
 	  
 	  function showError(error) {
@@ -102,8 +100,6 @@
 		});
 		view.animateTo(camera);
 	  }
-	  
-	  on(view, "click", function(){console.log(view);});
 	  
 	  window.onkeypress = function(evt) {
 	    console.log(evt.keyCode);
