@@ -41,7 +41,6 @@
 		//call the getParameterByName function to get the center and zoom url parameters
 		var center = getParameterByName("center");
 		var zoom = getParameterByName("zoom");
-		zoom = parseInt(zoom);
 		
 		//if the center parameter has a value
 		if(center) {
@@ -56,6 +55,7 @@
 		}
 		//if the zoom parameter has a value
 		if(zoom) {
+			zoom = parseInt(zoom);
 			//check the zoom variable to see if it is a valid value
 			if(isNaN(zoom) == false && zoom <= 19 && zoom >= 0) {
 				map.setZoom(zoom);
