@@ -50,22 +50,14 @@
 			var lon = parseFloat(coords[0]);
 			var lat = parseFloat(coords[1]);
 			//check the lat long values to see if they are a valid number
-			if(isNaN(lon) == true || isNaN(lat) == true) {
-				center = null;
-			}
-			//center the map on the current position
-			else {
+			if(isNaN(lon) == false && isNaN(lat) == false && lon <= 180 && lon >= -180 && lat <= 90 && lat >= -90) {
 				map.centerAt([lon, lat]);
 			}
 		}
 		//if the zoom parameter has a value
 		if(zoom) {
 			//check the zoom variable to see if it is a valid value
-			if(isNaN(zoom) == true || zoom > 20 || zoom < 0) {
-				zoom = null;
-			}
-			//set the zoom level of the map
-			else {
+			if(isNaN(zoom) == false && zoom <= 19 && zoom >= 0) {
 				map.setZoom(zoom);
 			}
 		}
