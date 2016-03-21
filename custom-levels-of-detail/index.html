@@ -39,12 +39,12 @@
       ) {
 
 		//the tiled basemap, limit the display levels of the basemap.
-        var satTiled = new ArcGISTiledMapServiceLayer("http://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer", {
+        var satTiled = new ArcGISTiledMapServiceLayer("https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer", {
           displayLevels: [10,11,12,13,14,15,16]
         });
 		
 		//the basemap used as a dynamic layer
-		var satDynamic = new DLayer("http://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer");
+		var satDynamic = new DLayer("https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer");
 		
 		//wait for the basemap to load
 		satTiled.on("load", function() {
