@@ -38,9 +38,10 @@
 
 		require(["JS/Game"],function(Game){
 			var game = new Game();
-			console.log(game);
 			game.createField("fieldContainer");
-			game.createFieldTiles().then(game.setFieldTokens());
+			game.createFieldTiles();
+			game.setFieldTokens();
+			game.readUserInput();
 		});
 	</script>
 </head>

@@ -1,10 +1,9 @@
 define (["jquery"],function($) {
 	return class Tile {
-		constructor(id,x,y) {
+		constructor(rowid,tileid,x,y) {
 			this.fScore = null;
 			this.gScore = 1;
 			this.hScore = null;
-			this.occupied = false;
 			this.los = false
 			this.firstDown = false;
 			this.opponentEndzone = false;
@@ -12,15 +11,17 @@ define (["jquery"],function($) {
 			this.x = x
 			this.y = y
 			this.element = $("<th class='tile'></th>");
-			this.addTile(id)
+			this.addTile(rowid);
+			this.id = tileid;
 		}
 		
 		calculateHScore(targetX,targetY) {
 			this.hScore =  Math.abs(this.x - targetX) + Math.abs(this.y - targetY);
+			return this.hScore;
 		}
 		
-		calculateFScore() {
-			this.fScore = this.gScore + this.hScore;
+		calculateFScore(targetX, targetY) {
+			this.fScore = this.gScore + this.calculateHScore(targetX, targetY);
 		}
 		
 		addTile(id) {
