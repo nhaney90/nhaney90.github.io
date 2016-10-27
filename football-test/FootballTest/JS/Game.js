@@ -1,19 +1,28 @@
 define (["JS/Tile.js","JS/Player.js","JS/LB.js"], function(Tile, Player, LB) {
 	return class Game {
 		constructor() {
-			this.resetTokens();
 			this.tiles = [];
 			this.fieldElementId = "field";
 			this.fieldElement = $("<table id='field'><tr id='row1'></tr><tr id='row2'><tr id='row3'></table>");
 			this.field = null;
 			this.rows = null;
 			this.ballSnapped = false;
+			//this.defenders = {RDE:null,LDE:null,DT:null,LB:null,CB:null,FS:null}
+			this.defenders = {LDE:null,DT:null,LB:null}
+			this.player = null;
+			this.ball = null;
 		}
 		
 		resetTokens() {
+			$(window).off();
+			this.player.removeElement(this.player.element);
 			this.player = null;
-			this.token = null;
 			this.ball = null;
+			for(var defender in this.defenders) {
+				if(this.defenders.hasOwnProperty(defender)) {
+					this.defenders[defender].removeElement(this.defenders[defender].element);
+				}
+			}
 			//this.defenders = {RDE:null,LDE:null,DT:null,LB:null,CB:null,FS:null}
 			this.defenders = {LDE:null,DT:null,LB:null}
 		}
@@ -55,6 +64,10 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js"], function(Tile, Player, LB) {
 		
 		tackeled() {
 			alert("Tackled!");
+			this.ballSnapped = false;
+			this.resetTokens();
+			this.setFieldTokens();
+			this.readUserInput();
 		}
 		
 		determineOutcomePlayer(status, tile, remove) {
@@ -107,15 +120,11 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js"], function(Tile, Player, LB) {
 				case 13: {
 					this.ballSnapped = true;
 					(function(game){
-						setInterval(function(){game.moveDefender();}, 1000);
+						var interval = setInterval(function(){
+							if(game.ballSnapped == false) clearInterval(interval);
+							else game.moveDefender();
+						}, 1000);
 					}(this));
-					/*this.wr.selectRoute();
-					rde.runDefense(rde.dFour);
-					lde.runDefense(lde.dFour);
-					dt.runDefense(dt.dFour);
-					lb.runDefense(lb.dFour);
-					fs.runDefense(fs.dFour);
-					cb.runDefense(cb.dFour);*/
 					break;
 				}
 				case 32: {
@@ -177,10 +186,10 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js"], function(Tile, Player, LB) {
 		
 		readUserInput() {
 			(function(game){
-				window.onkeydown = function(evt) {
+				$(window).on("keydown", function(evt) {
 					game.checkCode(evt.keyCode)
-				}}
-			(this));
+				});
+			}(this));
 		}
 	}
 });
