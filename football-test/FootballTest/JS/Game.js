@@ -35,13 +35,30 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js"], function(Tile, Player, LB) {
 			//this.defenders.FS = new FS():
 		}
 		
-		checkOccupiedTiles(id) {
-			if(id == this.defenders.LB.currentTile.id) return 0;
-			else return 1;
+		checkOccupiedTiles(id, type) {
+			var defenderOccupiedTileIds = [];
+			for(var defender in this.defenders) {
+				if(this.defenders.hasOwnProperty(defender)) {
+					defenderOccupiedTileIds.push(this.defenders[defender].currentTile.id);
+				}
+			}
+			if(type == 0) {
+				if(defenderOccupiedTileIds.includes(id)) return 0;
+				else return 1;
+			}
+			else if(type == 1) {
+				if(id == this.player.currentTile.id) return 0;
+				else if(defenderOccupiedTileIds.includes(id)) return 2;
+				else return 1
+			}
 		}
 		
-		determineOutcome(status, tile, remove) {
-			if(status == 0) console.log("Tackled!");
+		tackeled() {
+			alert("Tackled!");
+		}
+		
+		determineOutcomePlayer(status, tile, remove) {
+			if(status == 0) this.tackeled();
 			else if(status == 1) {
 				this.player.move(tile);
 				this.calculateFScores();
@@ -49,12 +66,17 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js"], function(Tile, Player, LB) {
 			}
 		}
 		
+		determineOutcomeDefender(status, tile, defender) {
+			if(status == 0) this.tackeled();
+			else if(status == 1) {
+				this.defenders[defender].move(tile);
+			}
+		}
+		
 		moveDefender() {
 			for(var defender in this.defenders) {
 				if(this.defenders.hasOwnProperty(defender)) {
 					var smallest = null;
-					console.log(defender);
-					console.log(this.defenders[defender]);
 					if(this.defenders[defender].currentTile.x + 1 < 10) {
 						smallest = this.findSmallestFScore(smallest, this.tiles[this.defenders[defender].currentTile.y][this.defenders[defender].currentTile.x+1]);
 					}
@@ -67,7 +89,10 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js"], function(Tile, Player, LB) {
 					if(this.defenders[defender].currentTile.y - 1 > -1) {
 						smallest = this.findSmallestFScore(smallest, this.tiles[this.defenders[defender].currentTile.y - 1][this.defenders[defender].currentTile.x]);
 					}
-					this.defenders[defender].move(smallest);
+					//console.log(smallest);
+					if(smallest.fScore < 5) {
+						this.determineOutcomeDefender(this.checkOccupiedTiles(smallest.id, 1), smallest, defender);
+					}
 				}
 			}
 		}
@@ -102,24 +127,24 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js"], function(Tile, Player, LB) {
 				case 37: {
 					if(this.ballSnapped) {
 						if(this.player.currentTile.x == 0) {
-							this.determineOutcome(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][9].id), this.tiles[this.player.currentTile.y][9], true);
+							this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][9].id, 0), this.tiles[this.player.currentTile.y][9], true);
 						}
 						else {
-							this.determineOutcome(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][this.player.currentTile.x - 1].id), this.tiles[this.player.currentTile.y][this.player.currentTile.x - 1], false);
+							this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][this.player.currentTile.x - 1].id, 0), this.tiles[this.player.currentTile.y][this.player.currentTile.x - 1], false);
 						}
 					}
 					break;
 				}
 				case 38: {
-					if((this.player.currentTile.y - 1) > -1 && this.ballSnapped) this.determineOutcome(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y - 1][this.player.currentTile.x].id), this.tiles[this.player.currentTile.y - 1][this.player.currentTile.x], false);
+					if((this.player.currentTile.y - 1) > -1 && this.ballSnapped) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y - 1][this.player.currentTile.x].id, 0), this.tiles[this.player.currentTile.y - 1][this.player.currentTile.x], false);
 					break;
 				}
 				case 39: {
-					if(this.player.currentTile.x + 1 < 10 && this.ballSnapped) this.determineOutcome(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][this.player.currentTile.x + 1].id), this.tiles[this.player.currentTile.y][this.player.currentTile.x + 1],false);
+					if(this.player.currentTile.x + 1 < 10 && this.ballSnapped) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][this.player.currentTile.x + 1].id, 0), this.tiles[this.player.currentTile.y][this.player.currentTile.x + 1],false);
 					break;
 				}
 				case 40: {
-					if((this.player.currentTile.y + 1) < 3 && this.ballSnapped) this.determineOutcome(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y + 1][this.player.currentTile.x].id), this.tiles[this.player.currentTile.y + 1][this.player.currentTile.x],false);
+					if((this.player.currentTile.y + 1) < 3 && this.ballSnapped) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y + 1][this.player.currentTile.x].id, 0), this.tiles[this.player.currentTile.y + 1][this.player.currentTile.x],false);
 					break;
 				}
 			}
@@ -131,7 +156,6 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js"], function(Tile, Player, LB) {
 					this.tiles[i][j].calculateFScore(this.player.currentTile.x, this.player.currentTile.y);
 				}
 			}
-			console.log(this.tiles);
 		}
 		
 		createFieldTiles() {
