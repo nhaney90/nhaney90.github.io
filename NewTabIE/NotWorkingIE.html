@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--<meta http-equiv="Content-Type" content="text/html; charset=utf-8">-->
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+    <title>Building Inspection Map</title>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/3.17/dijit/themes/claro/claro.css">
+    <link rel="stylesheet" href="https://js.arcgis.com/3.17/esri/css/esri.css">
+
+    <style>
+        html, body {
+            height: 97%;
+            width: 98%;
+            margin: 1%;
+        }
+
+        #rightPane {
+            width: 20%;
+        }
+
+        #legendPane {
+            border: solid #97DCF2 1px;
+        }
+
+        #HomeButton {
+            position: absolute;
+            top: 95px;
+            left: 30px;
+            z-index: 50;
+        }
+    </style>
+
+    <script src="https://js.arcgis.com/3.17/"></script>
+    <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
+
+    <script type="text/javascript">
+        //set some global variables
+        var crmContext = '';
+        var xmlhttp = '';
+        var returnData = new Array();
+        var waypointData = new Array();
+        var selectedIds = new Array();
+        var addrPoints = new Array();
+        var entityType = '';
+        var entityTypeCode = '';
+        var optionSetArray = new Array();
+        var formattedData = '';
+        var map;
+        require([
+                'dojo/_base/declare', 'dojo/_base/lang', 'dojo/_base/html', 'dojo/dom', "dojo/_base/array", "dojo/on", "dojo/topic",
+                "esri/symbols/SimpleMarkerSymbol", 'esri/symbols/TextSymbol', 'esri/renderers/UniqueValueRenderer', "esri/renderers/SimpleRenderer", "esri/symbols/Font", "esri/Color",
+                "esri/layers/LabelClass", "esri/tasks/query", "esri/dijit/Search", "esri/tasks/locator", "esri/geometry/Extent",
+                "esri/config", "esri/graphic", "esri/InfoTemplate", "esri/dijit/HomeButton",
+                "esri/geometry/Multipoint", "esri/geometry/Point",
+                "esri/dijit/ColorPicker",
+                "dojo/json", "dojox/data/CsvStore",
+                "esri/map", "esri/layers/FeatureLayer", "esri/dijit/Legend",
+                "dojo/_base/array", "dojo/parser",
+                "dijit/layout/BorderContainer", "dijit/layout/ContentPane",
+                "dijit/layout/AccordionContainer",
+                "dojox/encoding/base64", "dojo/domReady!"
+        ], function (
+                declare, lang, html, dom, array, on, topic,
+                SimpleMarkerSymbol, TextSymbol, UniqueValueRenderer, SimpleRenderer, Font, Color,
+                LabelClass, Query, Search, Locator, Extent,
+                esriConfig, Graphic, InfoTemplate, HomeButton,
+                Multipoint, Point,
+                ColorPicker,
+                JSON, CsvStore,
+                Map, FeatureLayer, Legend,
+                arrayUtils, parser
+        ) {
+            parser.parse();
+
+            var featureCollection;
+            var EmptyAddress = [];
+            var addressField = "ADDR";
+
+            map = new Map("map", {
+                basemap: "topo",
+                center: [-96.6, 32.9],
+                zoom: 4,
+                showLabels: true
+            });
+
+            var home = new HomeButton({
+                map: map
+            }, "HomeButton");
+            home.startup();
+
+
+            //geocode
+            //var data = formattedData;
+            var data = "Inspector,ADDR,InspectionType,URL\nJason Oliver,300 N FIFTH ST,Electrical Final,http://test-dynapp/COG/main.aspx?etc=10072&id=25573a24-e454-e611-80e5-00505684bafc&pagetype=entityrecord\nJason Oliver,10 WINDING CREEK TRL,Electrical Rough,http://test-dynapp/COG/main.aspx?etc=10072&id=5f33982f-6269-e611-80eb-00505684bafc&pagetype=entityrecord\nJason Oliver,1000 BELMONT DR,Accessory Building (Residential) Final,http://test-dynapp/COG/main.aspx?etc=10072&id=2005f6a6-967e-e611-80ef-00505684bafc&pagetype=entityrecord\n";
+            //var data2 = "Inspector,ADDR,InspectionType,URL\nJohn Smith,2600 McCree Rd,Electrical,http://www.google.com\nMary Jones,115 S International Rd,Electrical,http://www.yahoo.com\nMary Jones,1035 Nicholson Rd,Plumbing,http://www.sina.com\nJohn Smith,1 McCree Rd,Plumbing,http://www.wsj.com\n";
+
+            console.log(data);
+
+            console.time("geocoding");
+
+            var csvStore = new CsvStore({
+                data: data,
+                separator: ","
+            });
+
+            csvStore.fetch({
+                onComplete: function (items) {
+                    featureCollection = generateFeatureCollectionTemplateCSV(csvStore, items);
+
+                    var s = new Search({
+                    });
+
+                    s.startup();
+
+                    var i = 0;
+
+                    // Add records in this CSV store as graphics		
+                    array.forEach(items, function (item) {
+
+                        var attrs = csvStore.getAttributes(item),
+                         attributes = {};
+                        // Read all the attributes for this record/item
+                        array.forEach(attrs, function (attr) {
+                            var value = Number(csvStore.getValue(item, attr));
+                            attributes[attr] = isNaN(value) ? csvStore.getValue(item, attr) : value;
+                        });
+
+
+
+                        //geocoder
+
+                        s.search(attributes[addressField]).then(function (response) {
+
+                            i++;
+                            if (response) {
+
+                                var geometry = response[0][0].feature.geometry;
+                                var graphic = new Graphic(geometry);
+
+                                graphic.setAttributes(attributes);
+
+                                featureCollection.featureSet.features.push(graphic);
+                            } else {
+                                EmptyAddress.push(attributes[addressField]);
+                            }
+
+                            if (i == items.length) {
+                                console.log("Finished Geocoding");
+                                topic.publish(
+                                    "ImportAdresses/Geocoder",
+                                    { count: items.length }
+                                );
+                            }
+                        });
+
+
+                    });
+
+
+                    var topicHandle = topic.subscribe("ImportAdresses/Geocoder", function (e) {
+                        //add result layer to map
+                        console.timeEnd("geocoding");
+                        console.log("Drawing layer... ");
+
+                        var template = new InfoTemplate();
+                        template.setTitle("<b>${ADDR}</b>");
+                        template.setContent("<b>Inspector: </b>${Inspector}<br />" +
+                                            "<b>Inspection Type: </b>${InspectionType}<br /><br />" +
+                                            "<b><a href=${URL}>View in CRM</a></b>");
+
+                        var InspLayer = new FeatureLayer(featureCollection,
+                                                         {
+                                                             infoTemplate: template,
+                                                             outFields: [addressField]
+                                                         });
+														 
+						console.log(InspLayer);
+
+                        var symbol = new SimpleMarkerSymbol();
+                        symbol.setSize("8");
+                        symbol.setColor(new Color([0, 0, 0, 0.5]));
+						
+						var renderer = new SimpleRenderer(symbol);
+						 InspLayer.setRenderer(renderer);
+
+                        /*var renderer = new UniqueValueRenderer(symbol, "InspectionType");
+                        renderer.addValue("Electrical", new SimpleMarkerSymbol().setColor(new Color([255, 0, 0, 0.5])));
+                        renderer.addValue("Plumbing", new SimpleMarkerSymbol().setColor(new Color([0, 255, 0, 0.5])));
+                        renderer.addValue("Building", new SimpleMarkerSymbol().setColor(new Color([0, 0, 255, 0.5])));
+                        renderer.addValue("Mechanical", new SimpleMarkerSymbol().setColor(new Color([255, 0, 255, 0.5])));
+
+                        renderer.addValue("Brick Tie", new SimpleMarkerSymbol().setColor(new Color([255, 60, 255, 0.5])));
+                        renderer.addValue("Electrical Final", new SimpleMarkerSymbol().setColor(new Color([255, 10, 255, 0.5])));
+                        renderer.addValue("Electrical Rough", new SimpleMarkerSymbol().setColor(new Color([255, 20, 255, 0.5])));
+                        renderer.addValue("Accessory Building (Residential) Final", new SimpleMarkerSymbol().setColor(new Color([255, 30, 255, 0.5])));
+                        renderer.addValue("Building Final & Storm Water", new SimpleMarkerSymbol().setColor(new Color([255, 40, 255, 0.5])));
+                        renderer.addValue("Frame & Storm Water", new SimpleMarkerSymbol().setColor(new Color([255, 50, 255, 0.5])));*/
+
+                        //label
+                        var labelsymbol = new TextSymbol().setColor(new Color(new Color([0, 0, 255, 0.9])));
+                        labelsymbol.font.setSize("10pt");
+                        labelsymbol.font.setFamily("arial");
+                        var json = {
+                            "labelExpressionInfo": { "value": "{ADDR}" }
+                        };
+                        var labelClass = new LabelClass(json);
+                        labelClass.symbol = labelsymbol;
+                        //InspLayer.setLabelingInfo([labelClass]);
+
+                       /* var citylimit = new FeatureLayer("http://map.garlandtx.gov/arcgis/rest/services/CityMap/City_Council_Districts/MapServer/0", {
+                            mode: FeatureLayer.MODE_ONDEMAND,
+                            outFields: []
+                        });*/
+
+                        //add the layers and legend
+                        map.addLayers([InspLayer]); //, citylimit]);
+
+                        map.on("layers-add-result", function (evt) {
+                            console.log("Drawing legend... ");
+                            var legendDijit = new Legend({
+                                map: map,
+                                layerInfos: [{
+                                    layer: InspLayer,
+                                    title: "Building_INSP"
+                                }]
+                            }, "legendDiv");
+                            legendDijit.startup();
+                        });
+
+
+                        var result = dom.byId("ImportAddressesResult");
+                        result.innerHTML = "<b>Result</b>: " + featureCollection.featureSet.features.length + " addresses have been added to the map. <br><br>" + EmptyAddress.length + " addresses can't find a match: <br>";
+                        result.style.color = "black";
+                        result.style.fontSize = "medium";
+
+                        array.forEach(EmptyAddress, function (item) {
+                            result.innerHTML = result.innerHTML + item + "<br>";
+
+                        }, this);
+
+
+                        featureCollection = null;
+                        EmptyAddress = [];
+
+
+                    });
+                }
+            });
+
+
+            function generateFeatureCollectionTemplateCSV(store, items) {
+                //create a feature collection for the input csv file
+                var layerDefinition = {
+                    "geometryType": "esriGeometryPoint",
+                    "objectIdField": "ADDR",
+                    "type": "Feature Layer",
+                    "typeIdField": "",
+                    "drawingInfo": {
+                        "renderer": {
+                            "type": "simple"
+                        }
+                    },
+                    "fields": [
+                     {
+                         "name": "ADDR",
+                         "alias": "ADDR",
+                         "type": "esriFieldTypeString",
+                         "editable": false,
+                         "domain": null
+                     }
+                    ],
+                    "types": [],
+                    "capabilities": "Query"
+                };
+
+                var featureCollection = {
+                    "layerDefinition": layerDefinition,
+                    "featureSet": {
+                        "features": [],
+                        "geometryType": "esriGeometryPoint"
+                    }
+                };
+
+
+                var fields = store.getAttributes(items[0]);
+                array.forEach(fields, function (field) {
+                    var value = store.getValue(items[0], field);
+                    var parsedValue = Number(value);
+                    if (isNaN(parsedValue)) { //check first value and see if it is a number
+                        featureCollection.layerDefinition.fields.push({
+                            "name": field,
+                            "alias": field,
+                            "type": "esriFieldTypeString",
+                            "editable": true,
+                            "domain": null
+                        });
+                    }
+                    else {
+                        featureCollection.layerDefinition.fields.push({
+                            "name": field,
+                            "alias": field,
+                            "type": "esriFieldTypeDouble",
+                            "editable": true,
+                            "domain": null
+                        });
+                    }
+                });
+                return featureCollection;
+            }
+
+
+        });
+    </script>
+</head>
+
+<body class="claro">
+    <h3>Building Inspection Map</h3>
+
+    <div id="content"
+        data-dojo-type="dijit/layout/BorderContainer"
+        data-dojo-props="design:'headline', gutters:true"
+        style="width: 100%; height: 100%; margin: 0;">
+
+        <div id="rightPane"
+            data-dojo-type="dijit/layout/ContentPane"
+            data-dojo-props="region:'right'">
+
+            <div data-dojo-type="dijit/layout/AccordionContainer">
+                <div data-dojo-type="dijit/layout/ContentPane" id="legendPane"
+                    data-dojo-props="title:'Legend'">
+                    <div id="legendDiv"></div>
+                </div>
+                <div data-dojo-type="dijit/layout/ContentPane" id="ResultPane"
+                    data-dojo-props="title:'Missing Address', selected:true">
+                    <div id="ImportAddressesResult"></div>
+
+                </div>
+            </div>
+        </div>
+        <div id="map"
+            data-dojo-type="dijit/layout/ContentPane"
+            data-dojo-props="region:'center'"
+            style="overflow: hidden;">
+            <div id="HomeButton"></div>
+
+        </div>
+    </div>
+</body>
+
+</html>
