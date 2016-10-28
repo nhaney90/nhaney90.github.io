@@ -40,7 +40,7 @@ define (["JS/Token.js"],function(Token) {
 								}
 							}
 						}
-					}, 300);
+					}, 200);
 				}(ball));
 			});
 		}
