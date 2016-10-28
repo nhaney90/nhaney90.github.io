@@ -9,7 +9,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			this.ballSnapped = false;
 			this.defenders = {RDE:null,LDE:null,DT:null,LB:null,CB:null,FS:null}
 			this.player = null;
-			this.ball = null;
+			this.ballInAir = false;
 		}
 		
 		resetTokens() {
@@ -19,6 +19,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			this.ball = null;
 			if(!this.wr.halt)this.wr.stopRoute();
 			this.wr = null;
+			this.ballInAir = false;
 			for(var defender in this.defenders) {
 				if(this.defenders.hasOwnProperty(defender)) {
 					this.defenders[defender].removeElement(this.defenders[defender].element);
@@ -50,18 +51,26 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 					defenderOccupiedTileIds.push(this.defenders[defender].currentTile.id);
 				}
 			}
+			//type 2 for player
 			if(type == 0) {
+				//player is tackled
 				if(defenderOccupiedTileIds.includes(id)) return 0;
+				//player moves forward
 				else return 1;
 			}
+			//type 1 is for defenders
 			else if(type == 1) {
+				//player is tackled
 				if(id == this.player.currentTile.id) return 0;
+				//space is occupied by defender
 				else if(defenderOccupiedTileIds.includes(id)) return 2;
+				//receiver or ball
 				else return 1
 			}
 		}
 		
-		tackeled() {
+		tackled() {
+			alert("Tackled!");
 			this.ballSnapped = false;
 			this.resetTokens();
 			this.setFieldTokens();
@@ -69,7 +78,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 		}
 		
 		determineOutcomePlayer(status, tile, remove) {
-			if(status == 0) this.tackeled();
+			if(status == 0) this.tackled();
 			else if(status == 1) {
 				this.player.move(tile);
 				if(tile.x < 7) {
@@ -77,12 +86,11 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 					if(!this.wr.halt)this.wr.stopRoute();
 				}
 				this.calculateFScores();
-				//if(remove) this.removeReciever();
 			}
 		}
 		
 		determineOutcomeDefender(status, tile, defender) {
-			if(status == 0) this.tackeled();
+			if(status == 0 && this.ballInAir == false) this.tackled();
 			else if(status == 1) {
 				this.defenders[defender].move(tile);
 			}
@@ -153,6 +161,18 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			}(this, path));
 		}
 		
+		checkBallStatus(status) {
+			this.ballInAir = false;
+			if(status == "caught") {
+				this.swapWRAndPlayer();
+			}
+		}
+		
+		swapWRAndPlayer() {
+			this.player.move(this.wr.currentTile);
+			this.wr.stopRoute();
+		}
+		
 		checkCode(code) {
 			switch(code) {
 				case 13: {
@@ -173,7 +193,12 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 				}
 				case 32: {
 					if(this.ballSnapped) {
-						//if(this.canPass)this.pass();
+						if(this.player.canPass){
+							this.ballInAir = true;
+							(function(game){
+								game.player.pass(game).then(function(response) {console.log(game);game.checkBallStatus(response);});
+							}(this));
+						}
 					}
 					break;
 				}

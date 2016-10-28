@@ -1,0 +1,39 @@
+define (["JS/Token.js"],function(Token) {
+	return class Ball extends Token {
+		constructor(tile, game) {
+			super();
+			this.elementId = "ball";
+			this.elementHTML = "<div id='ball' class='tile ball'>Ball</div>";
+			this.element = null;
+			this.currentTile = tile
+			this.game = game
+			this.addElement(this.currentTile.element, this.elementHTML);
+		}
+		
+		fly() {
+			var ball = this;
+			return new Promise(function(resolve, reject) {
+				(function(ball){
+					var intervalID = setInterval(function() {
+						if(ball.currentTile.x - 1 < 0) {
+							resolve("incomplete");
+						}
+						else {
+							ball.move(ball.game.tiles[ball.currentTile.y][ball.currentTile.x - 1]);
+							if(ball.game.wr.currentTile == ball.currentTile) {
+								clearInterval(intervalID);
+								ball.removeElement(ball.element);
+								resolve("caught");
+							}
+							else if($("#"+ball.currentTile.elementId).children().length > 0) {
+								clearInterval(intervalID);
+								ball.removeElement(ball.element);
+								resolve("intercepted");
+							}
+						}
+					}, 300);
+				}(ball));
+			});
+		}
+	}
+});

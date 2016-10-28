@@ -1,4 +1,4 @@
-define (["JS/Token.js"],function(Token) {
+define (["JS/Token.js", "JS/Ball.js"],function(Token, Ball) {
 	return class Player extends Token {
 		constructor(tile) {
 			super();
@@ -10,11 +10,11 @@ define (["JS/Token.js"],function(Token) {
 			this.canPass = false;
 		}
 				
-		pass() {
-			/*if(this.ball == null) {
-				this.ball = new Ball(this.currentTile, {left:this.adjacentTiles.left, right:this.adjacentTiles.right, bottom:this.adjacentTiles.bottom, top:this.adjacentTiles.top}, this);
-				this.ball.fly().then(this.checkStatus, this.turnOver);
-			}*/
+		pass(game) {
+			var ball = new Ball(this.currentTile, game);
+			return new Promise(function(resolve, reject) {
+				resolve(ball.fly());
+			});
 		}
 				
 	}
