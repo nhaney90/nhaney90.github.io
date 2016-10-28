@@ -291,6 +291,117 @@
 				}
 				
 				turnOver(error) {console.log(error)}
+			}class Player extends Token {
+				constructor() {
+					super();
+					this.elementId = "player";
+					this.elementText = "<div id='player' class='tile player'>QB</div>";
+					this.currentTile = 20;
+					this.addElement(this.currentTile, this.elementText);
+					this.setInitialTiles();
+					this.ball = null;
+					this.wr = new Reciever();
+					this.canPass = true;
+					this.ballSnapped = false;
+				}
+				
+				setInitialTiles() {
+					this.adjacentTiles = {left:19,right:null,bottom:30,top:10};
+				}
+				
+				removeReceiver() {
+					this.wr.removeElement();
+					this.wr.halt = true;
+				}
+				
+				move(position) {
+					if($("#tile" + position).children().length != 0) {
+						var id = $("#tile" + position).children()[0].id;
+						if(id == "wr") {
+							this.moveToken(position);
+						}
+						else {
+							alert("tackled!");
+						}
+					}
+					else {
+						this.moveToken(position);
+					}
+					if(position == 27 || position == 17 || position == 7) this.canPass = false;
+				}
+				
+				checkKeyCode(code) {
+					var newTile
+					switch(code) {
+						case 13: {
+							this.ballSnapped = true;
+							this.wr.selectRoute();
+							rde.runDefense(rde.dFour);
+							lde.runDefense(lde.dFour);
+							dt.runDefense(dt.dFour);
+							lb.runDefense(lb.dFour);
+							fs.runDefense(fs.dFour);
+							cb.runDefense(cb.dFour);
+							break;
+						}
+						case 32: {
+							if(this.ballSnapped) {
+								if(this.canPass)this.pass();
+							}
+							break;
+						}
+						case 37: {
+							if(this.ballSnapped) {
+								var check = (this.currentTile + 9) / 10;
+								if(check == 1){ newTile = 10; this.removeReceiver();}
+								else if(check == 2){ newTile = 20; this.removeReceiver();}
+								else if(check == 3){newTile = 30; this.removeReceiver();}
+								else newTile = this.adjacentTiles.left;
+							}
+							break;
+						}
+						case 38: {
+							if(this.ballSnapped) {
+								newTile = this.adjacentTiles.top;
+							}
+							break;
+						}
+						case 39: {
+							if(this.ballSnapped) {
+								if(this.currentTile % 10 == 0) newTile = null;
+								else newTile = this.adjacentTiles.right;
+							}
+							break;
+						}
+						case 40: {
+							if(this.ballSnapped) {
+								newTile = this.adjacentTiles.bottom;
+							}
+							break;
+						}
+					}
+					if(newTile) {
+						this.move(newTile);
+					}
+				}
+				
+				pass() {
+					if(this.ball == null) {
+						this.ball = new Ball(this.currentTile, {left:this.adjacentTiles.left, right:this.adjacentTiles.right, bottom:this.adjacentTiles.bottom, top:this.adjacentTiles.top}, this);
+						this.ball.fly().then(this.checkStatus, this.turnOver);
+					}
+				}
+				
+				checkStatus(response) {
+					if(response.status == "caught") {
+						response.ball.player.removeReceiver();
+						response.ball.player.wr.removeElement();
+						response.ball.removeElement();
+						response.ball.player.move(response.ball.currentTile);
+					}
+				}
+				
+				turnOver(error) {console.log(error)}
 			}
 			
 			class Defender extends Token {

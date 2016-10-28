@@ -1,4 +1,4 @@
-define (["JS/Tile.js","JS/Player.js","JS/LB.js"], function(Tile, Player, LB) {
+define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.js","JS/CB.js","JS/FS.js","JS/WR.js"], function(Tile, Player, LB, DT, RDE, LDE, CB, FS, WR) {
 	return class Game {
 		constructor() {
 			this.tiles = [];
@@ -7,8 +7,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js"], function(Tile, Player, LB) {
 			this.field = null;
 			this.rows = null;
 			this.ballSnapped = false;
-			//this.defenders = {RDE:null,LDE:null,DT:null,LB:null,CB:null,FS:null}
-			this.defenders = {LDE:null,DT:null,LB:null}
+			this.defenders = {RDE:null,LDE:null,DT:null,LB:null,CB:null,FS:null}
 			this.player = null;
 			this.ball = null;
 		}
@@ -18,30 +17,30 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js"], function(Tile, Player, LB) {
 			this.player.removeElement(this.player.element);
 			this.player = null;
 			this.ball = null;
+			if(!this.wr.halt)this.wr.stopRoute();
+			this.wr = null;
 			for(var defender in this.defenders) {
 				if(this.defenders.hasOwnProperty(defender)) {
 					this.defenders[defender].removeElement(this.defenders[defender].element);
 				}
 			}
-			//this.defenders = {RDE:null,LDE:null,DT:null,LB:null,CB:null,FS:null}
-			this.defenders = {LDE:null,DT:null,LB:null}
+			this.defenders = {RDE:null,LDE:null,DT:null,LB:null,CB:null,FS:null}
 		}
 		
 		setFieldTokens() {
 			this.player = new Player(this.tiles[1][9]);
 			this.calculateFScores();
 			this.addDefenders();
-			//this.wr = new Receiver();
-			//addDefenders();
+			this.wr = new WR(this.tiles[2][6]);
 		}
 		
 		addDefenders() {
-			//this.defenders.RDE = new RDE();
-			this.defenders.LDE = new LB(this.tiles[2][7]);
-			this.defenders.DT = new LB(this.tiles[0][3])
-			this.defenders.LB = new LB(this.tiles[1][5]);
-			//this.defenders.CB = new CB();
-			//this.defenders.FS = new FS():
+			this.defenders.LDE = new LDE(this.tiles[0][6]);
+			this.defenders.RDE = new RDE(this.tiles[2][6]);
+			this.defenders.DT = new DT(this.tiles[1][6]);
+			this.defenders.LB = new LB(this.tiles[1][4]);
+			this.defenders.CB = new CB(this.tiles[0][2]);
+			this.defenders.FS = new FS(this.tiles[2][0]);
 		}
 		
 		checkOccupiedTiles(id, type) {
@@ -63,7 +62,6 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js"], function(Tile, Player, LB) {
 		}
 		
 		tackeled() {
-			alert("Tackled!");
 			this.ballSnapped = false;
 			this.resetTokens();
 			this.setFieldTokens();
@@ -74,6 +72,10 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js"], function(Tile, Player, LB) {
 			if(status == 0) this.tackeled();
 			else if(status == 1) {
 				this.player.move(tile);
+				if(tile.x < 7) {
+					this.player.canPass = false;
+					if(!this.wr.halt)this.wr.stopRoute();
+				}
 				this.calculateFScores();
 				//if(remove) this.removeReciever();
 			}
@@ -86,28 +88,48 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js"], function(Tile, Player, LB) {
 			}
 		}
 		
+		selectRandomDefender() {
+			if(this.player.canPass == true) {
+				var random = Math.floor(Math.random() * 6)
+				if(random < 2) return "RDE";
+				else if(random == 2 || random == 3) return "LDE"
+				else if(random == 4) return "DT";
+				else return "LB";
+			}
+			else {
+				var random = Math.floor(Math.random() * 12)
+				if(random < 3) return "LB";
+				else if(random > 2 && random < 6) return "CB";
+				else if(random > 5 && random < 9) return "FS";
+				else if(random == 9) return "RDE";
+				else if(random == 10) return "LDE";
+				else return "DT";
+			}
+		}
+		
 		moveDefender() {
-			for(var defender in this.defenders) {
-				if(this.defenders.hasOwnProperty(defender)) {
-					var smallest = null;
-					if(this.defenders[defender].currentTile.x + 1 < 10) {
-						smallest = this.findSmallestFScore(smallest, this.tiles[this.defenders[defender].currentTile.y][this.defenders[defender].currentTile.x+1]);
-					}
-					if(this.defenders[defender].currentTile.x - 1 > 0) {
-						smallest = this.findSmallestFScore(smallest, this.tiles[this.defenders[defender].currentTile.y][this.defenders[defender].currentTile.x-1]);
-					}
-					if(this.defenders[defender].currentTile.y + 1 < 3) {
-						smallest = this.findSmallestFScore(smallest, this.tiles[this.defenders[defender].currentTile.y + 1][this.defenders[defender].currentTile.x]);
-					}
-					if(this.defenders[defender].currentTile.y - 1 > -1) {
-						smallest = this.findSmallestFScore(smallest, this.tiles[this.defenders[defender].currentTile.y - 1][this.defenders[defender].currentTile.x]);
-					}
-					//console.log(smallest);
-					if(smallest.fScore < 5) {
-						this.determineOutcomeDefender(this.checkOccupiedTiles(smallest.id, 1), smallest, defender);
-					}
+			var success = false;
+			while(success == false) {
+				var defender = this.selectRandomDefender();
+				var smallest = null;
+				if(this.defenders[defender].currentTile.x + 1 < 10) {
+					smallest = this.findSmallestFScore(smallest, this.tiles[this.defenders[defender].currentTile.y][this.defenders[defender].currentTile.x+1]);
+				}
+				if(this.defenders[defender].currentTile.x - 1 > 0) {
+					smallest = this.findSmallestFScore(smallest, this.tiles[this.defenders[defender].currentTile.y][this.defenders[defender].currentTile.x-1]);
+				}
+				if(this.defenders[defender].currentTile.y + 1 < 3) {
+					smallest = this.findSmallestFScore(smallest, this.tiles[this.defenders[defender].currentTile.y + 1][this.defenders[defender].currentTile.x]);
+				}
+				if(this.defenders[defender].currentTile.y - 1 > -1) {
+					smallest = this.findSmallestFScore(smallest, this.tiles[this.defenders[defender].currentTile.y - 1][this.defenders[defender].currentTile.x]);
+				}
+
+				if(smallest.fScore <= this.defenders[defender].reactZone) {
+					success = true;
 				}
 			}
+			this.determineOutcomeDefender(this.checkOccupiedTiles(smallest.id, 1), smallest, defender);
 		}
 		
 		findSmallestFScore(currentValue, newValue) {
@@ -115,16 +137,38 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js"], function(Tile, Player, LB) {
 			else return currentValue;
 		}
 		
+		runRoute() {
+			var path = this.wr.selectRandomRoute();
+			(function(game, routePath){
+				var interval = setInterval(function(){
+					console.log(game.player.canPass);
+					if(routePath.length > 0 && game.player.canPass == true) {
+						var node = routePath.shift();
+						game.wr.move(game.tiles[node.y][node.x])
+					}
+					else {
+						clearInterval(interval);
+					}
+				}, 1000);
+			}(this, path));
+		}
+		
 		checkCode(code) {
 			switch(code) {
 				case 13: {
-					this.ballSnapped = true;
-					(function(game){
-						var interval = setInterval(function(){
-							if(game.ballSnapped == false) clearInterval(interval);
-							else game.moveDefender();
-						}, 1000);
-					}(this));
+					if(!this.ballSnapped) {
+						this.player.canPass = true;
+						this.ballSnapped = true;
+						this.runRoute();
+						(function(game){
+							var interval = setInterval(function(){
+								console.log(game.player.canPass);
+								if(game.ballSnapped == false) clearInterval(interval);
+								else if(game.player.canPass == false) game.moveDefender();
+								else game.moveDefender();
+							}, 1000);
+						}(this));
+					}
 					break;
 				}
 				case 32: {

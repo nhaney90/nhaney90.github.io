@@ -13,7 +13,6 @@ define (["jquery"],function($) {
 		}
 		
 		move(tile) {
-			if(tile.x > 7) this.canPass = false;
 			this.removeElement(this.element);
 			this.addElement(tile.element, this.elementHTML);
 			this.currentTile = tile

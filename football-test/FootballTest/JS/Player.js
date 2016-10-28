@@ -3,11 +3,11 @@ define (["JS/Token.js"],function(Token) {
 		constructor(tile) {
 			super();
 			this.elementId = "player";
-			this.elementHTML = "<div id='player' class='tile player'>QB</div>";
+			this.elementHTML = "<div id='player' class='token player'>QB</div>";
 			this.element = null;
 			this.currentTile = tile 
 			this.addElement(this.currentTile.element, this.elementHTML);
-			this.canPass = true;
+			this.canPass = false;
 		}
 				
 		pass() {
