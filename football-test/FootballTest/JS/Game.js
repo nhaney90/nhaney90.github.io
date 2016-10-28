@@ -193,7 +193,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 				}
 				case 32: {
 					if(this.ballSnapped) {
-						if(this.player.canPass){
+						if(this.player.canPass && this.ballInAir == false){
 							this.ballInAir = true;
 							(function(game){
 								game.player.pass(game).then(function(response) {console.log(game);game.checkBallStatus(response);});
