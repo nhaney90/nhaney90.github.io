@@ -161,10 +161,32 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			}(this, path));
 		}
 		
+		ballIntercepted() {
+			alert("Picked Off!");
+			this.ballSnapped = false;
+			this.resetTokens();
+			this.setFieldTokens();
+			this.readUserInput();
+		}
+		
+		passIncomplete() {
+			alert("Incomplete!");
+			this.ballSnapped = false;
+			this.resetTokens();
+			this.setFieldTokens();
+			this.readUserInput();
+		}
+		
 		checkBallStatus(status) {
 			this.ballInAir = false;
 			if(status == "caught") {
 				this.swapWRAndPlayer();
+			}
+			else if(status == "intercepted") {
+				this.ballIntercepted();
+			}
+			else {
+				this.passIncomplete();
 			}
 		}
 		
@@ -196,7 +218,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 						if(this.player.canPass && this.ballInAir == false){
 							this.ballInAir = true;
 							(function(game){
-								game.player.pass(game).then(function(response) {console.log(game);game.checkBallStatus(response);});
+								game.player.pass(game).then(function(response) {console.log(response);game.checkBallStatus(response);});
 							}(this));
 						}
 					}

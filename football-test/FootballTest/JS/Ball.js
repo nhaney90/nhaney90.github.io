@@ -16,6 +16,8 @@ define (["JS/Token.js"],function(Token) {
 				(function(ball){
 					var intervalID = setInterval(function() {
 						if(ball.currentTile.x - 1 < 0) {
+							clearInterval(intervalID);
+							ball.removeElement(ball.element);
 							resolve("incomplete");
 						}
 						else {
@@ -25,10 +27,17 @@ define (["JS/Token.js"],function(Token) {
 								ball.removeElement(ball.element);
 								resolve("caught");
 							}
-							else if($("#"+ball.currentTile.elementId).children().length > 0) {
-								clearInterval(intervalID);
-								ball.removeElement(ball.element);
-								resolve("intercepted");
+							for(var defender in ball.game.defenders) {
+								if(ball.game.defenders.hasOwnProperty(defender)) {
+									if(ball.game.defenders[defender].currentTile == ball.currentTile){
+										if(ball.game.defenders[defender].elementId == "lb" || ball.game.defenders[defender].elementId == "fs" || ball.game.defenders[defender].elementId == "cb") {
+											clearInterval(intervalID);
+											ball.removeElement(ball.element);
+											resolve("intercepted");
+											break;
+										}
+									}
+								}
 							}
 						}
 					}, 300);
