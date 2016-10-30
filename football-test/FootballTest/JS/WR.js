@@ -28,8 +28,7 @@ define (["JS/Token.js"],function(Token) {
 
 		selectRandomRoute() {
 			var tempInt = Math.floor(Math.random() * 8)
-			var temp = this.routes[tempInt];
-			return temp;
+			return this.routes[tempInt];
 		}
 	}
 });

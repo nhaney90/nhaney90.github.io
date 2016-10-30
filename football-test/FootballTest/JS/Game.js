@@ -1,4 +1,4 @@
-define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.js","JS/CB.js","JS/FS.js","JS/WR.js"], function(Tile, Player, LB, DT, RDE, LDE, CB, FS, WR) {
+define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.js","JS/CB.js","JS/FS.js","JS/WR.js","JS/Stats"], function(Tile, Player, LB, DT, RDE, LDE, CB, FS, WR) {
 	return class Game {
 		constructor() {
 			this.tiles = [];
@@ -10,6 +10,8 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			this.defenders = {RDE:null,LDE:null,DT:null,LB:null,CB:null,FS:null}
 			this.player = null;
 			this.ballInAir = false;
+			this.tokenEnum = {player:0, defender:1, wr:2, ball: 3}
+			this.tileEnum = {open:0, player: 1, defender: 2, wr: 3, ball: 4}
 		}
 		
 		resetTokens() {
@@ -51,25 +53,23 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 					defenderOccupiedTileIds.push(this.defenders[defender].currentTile.id);
 				}
 			}
-			//type 0 for player
-			if(type == 0) {
+			if(type == this.tokenEnum.player) {
 				//player is tackled
-				if(defenderOccupiedTileIds.includes(id)) return 0;
+				if(defenderOccupiedTileIds.includes(id)) return this.tileEnum.defender;
 				//player moves forward
-				else return 1;
+				else return this.tileEnum.open;
 			}
-			//type 1 is for defenders
-			else if(type == 1) {
+			else if(type == this.tokenEnum.defender) {
 				//player is tackled
-				if(id == this.player.currentTile.id) return 0;
+				if(id == this.player.currentTile.id) return this.tileEnum.player;
 				//space is occupied by defender
-				else if(defenderOccupiedTileIds.includes(id)) return 2;
+				else if(defenderOccupiedTileIds.includes(id)) return this.tileEnum.defender;
 				//receiver or ball
-				else return 1
+				else return this.tileEnum.open;
 			}
-			else if(type == 2) {
-				if(defenderOccupiedTileIds.includes(id))return 0;
-				else return 1;
+			else if(type == this.tokenEnum.wr) {
+				if(defenderOccupiedTileIds.includes(id))return this.tileEnum.defender;
+				else return this.tileEnum.open;
 			}
 		}
 		
@@ -84,8 +84,8 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 		}
 		
 		determineOutcomePlayer(status, tile, remove) {
-			if(status == 0 && this.ballInAir == false) this.tackled();
-			else if(status == 1) {
+			if(status == this.tileEnum.defender && this.ballInAir == false) this.tackled();
+			else if(status == this.tileEnum.open) {
 				this.player.move(tile);
 				if(tile.x < 7) {
 					this.player.canPass = false;
@@ -96,8 +96,8 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 		}
 		
 		determineOutcomeDefender(status, tile, defender) {
-			if(status == 0 && this.ballInAir == false) this.tackled();
-			else if(status == 1) {
+			if(status == this.tileEnum.player && this.ballInAir == false) this.tackled();
+			else if(status == this.tileEnum.open) {
 				this.defenders[defender].move(tile);
 				(function(game, defender){
 					setTimeout(function(){game.moveDefender();}, game.defenders[defender].interval);
@@ -146,7 +146,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 						success = true;
 					}
 				}
-				this.determineOutcomeDefender(this.checkOccupiedTiles(smallest.id, 1), smallest, defender);
+				this.determineOutcomeDefender(this.checkOccupiedTiles(smallest.id, this.tokenEnum.defender), smallest, defender);
 			}
 		}
 		
@@ -160,19 +160,19 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			if(route) path = route;
 			else path = this.wr.selectRandomRoute();
 			(function(game, routePath) {
+				console.log(game.player.canPass);
 				if(routePath.length > 0 && game.player.canPass == true) {
 					var node;
-					var occupied = game.checkOccupiedTiles(game.tiles[routePath[0].y][routePath[0].x].id, 0);
+					var occupied = game.checkOccupiedTiles(game.tiles[routePath[0].y][routePath[0].x].id, game.tokenEnum.wr);
 					console.log(occupied);
-					if(occupied == 0) node = routePath[0]; 
-					else node = routePath.shift();
-					game.wr.move(game.tiles[node.y][node.x]);
+					if(occupied == game.tileEnum.open) {
+						node = routePath.shift();
+						game.wr.move(game.tiles[node.y][node.x]);
+					}
 					setTimeout(function(){game.runRoute(routePath);}, game.wr.interval);
 				}
 			}(this, path));
 		}
-		
-		
 		
 		ballIntercepted() {
 			alert("Picked Off!");
@@ -204,12 +204,14 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 		}
 		
 		swapWRAndPlayer() {
-			this.player.move(this.wr.currentTile);
 			this.wr.stopRoute();
+			this.player.canPass = false;
+			this.player.move(this.wr.currentTile);
 		}
 		
 		checkCode(code) {
 			switch(code) {
+				//enter - snap ball
 				case 13: {
 					if(!this.ballSnapped) {
 						this.player.canPass = true;
@@ -227,6 +229,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 					}
 					break;
 				}
+				//space - pass ball
 				case 32: {
 					if(this.ballSnapped) {
 						if(this.player.canPass && this.ballInAir == false){
@@ -238,27 +241,32 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 					}
 					break;
 				}
+				//move left
 				case 37: {
 					if(this.ballSnapped) {
 						if(this.player.currentTile.x == 0) {
-							this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][9].id, 0), this.tiles[this.player.currentTile.y][9], true);
+							this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][9].id, this.tokenEnum.player), this.tiles[this.player.currentTile.y][9], true);
 						}
 						else {
-							this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][this.player.currentTile.x - 1].id, 0), this.tiles[this.player.currentTile.y][this.player.currentTile.x - 1], false);
+							this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][this.player.currentTile.x - 1].id, this.tokenEnum.player), this.tiles[this.player.currentTile.y][this.player.currentTile.x - 1], false);
 						}
 					}
 					break;
 				}
+				//move up
 				case 38: {
-					if((this.player.currentTile.y - 1) > -1 && this.ballSnapped) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y - 1][this.player.currentTile.x].id, 0), this.tiles[this.player.currentTile.y - 1][this.player.currentTile.x], false);
+					if((this.player.currentTile.y - 1) > -1 && this.ballSnapped) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y - 1][this.player.currentTile.x].id, this.tokenEnum.player), this.tiles[this.player.currentTile.y - 1][this.player.currentTile.x], false);
 					break;
 				}
+				//move right
 				case 39: {
-					if(this.player.currentTile.x + 1 < 10 && this.ballSnapped) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][this.player.currentTile.x + 1].id, 0), this.tiles[this.player.currentTile.y][this.player.currentTile.x + 1],false);
+					if(this.player.currentTile.x + 1 < 10 && this.ballSnapped) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][this.player.currentTile.x + 1].id, this.tokenEnum.player), this.tiles[this.player.currentTile.y][this.player.currentTile.x + 1],false);
+					else if(this.player.currentTile.x + 1 > 9 && this.ballSnapped && this.player.canPass == false) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][0].id, this.tokenEnum.player), this.tiles[this.player.currentTile.y][0],false);
 					break;
 				}
+				//move down
 				case 40: {
-					if((this.player.currentTile.y + 1) < 3 && this.ballSnapped) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y + 1][this.player.currentTile.x].id, 0), this.tiles[this.player.currentTile.y + 1][this.player.currentTile.x],false);
+					if((this.player.currentTile.y + 1) < 3 && this.ballSnapped) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y + 1][this.player.currentTile.x].id, this.tokenEnum.player), this.tiles[this.player.currentTile.y + 1][this.player.currentTile.x],false);
 					break;
 				}
 			}
