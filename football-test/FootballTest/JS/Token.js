@@ -8,7 +8,7 @@ define (["jquery"],function($) {
 		}
 					
 		removeElement(element) {
-			element.remove();
+			if(element)element.remove();
 			this.element = null;
 		}
 		

@@ -17,7 +17,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			this.player.removeElement(this.player.element);
 			this.player = null;
 			this.ball = null;
-			if(!this.wr.halt)this.wr.stopRoute();
+			if(this.wr.element)this.wr.stopRoute();
 			this.wr = null;
 			this.ballInAir = false;
 			for(var defender in this.defenders) {
@@ -51,7 +51,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 					defenderOccupiedTileIds.push(this.defenders[defender].currentTile.id);
 				}
 			}
-			//type 2 for player
+			//type 0 for player
 			if(type == 0) {
 				//player is tackled
 				if(defenderOccupiedTileIds.includes(id)) return 0;
@@ -67,23 +67,29 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 				//receiver or ball
 				else return 1
 			}
+			else if(type == 2) {
+				if(defenderOccupiedTileIds.includes(id))return 0;
+				else return 1;
+			}
 		}
 		
 		tackled() {
-			alert("Tackled!");
 			this.ballSnapped = false;
+			this.wr.halt = true;
+			if(this.player.canPass) alert("Sacked!");
+			else alert("Tackled!");
 			this.resetTokens();
 			this.setFieldTokens();
 			this.readUserInput();
 		}
 		
 		determineOutcomePlayer(status, tile, remove) {
-			if(status == 0) this.tackled();
+			if(status == 0 && this.ballInAir == false) this.tackled();
 			else if(status == 1) {
 				this.player.move(tile);
 				if(tile.x < 7) {
 					this.player.canPass = false;
-					if(!this.wr.halt)this.wr.stopRoute();
+					if(this.wr.element)this.wr.stopRoute();
 				}
 				this.calculateFScores();
 			}
@@ -93,16 +99,19 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			if(status == 0 && this.ballInAir == false) this.tackled();
 			else if(status == 1) {
 				this.defenders[defender].move(tile);
+				(function(game, defender){
+					setTimeout(function(){game.moveDefender();}, game.defenders[defender].interval);
+				}(this, defender));
 			}
+			else this.moveDefender();
 		}
 		
 		selectRandomDefender() {
 			if(this.player.canPass == true) {
-				var random = Math.floor(Math.random() * 6)
+				var random = Math.floor(Math.random() * 5)
 				if(random < 2) return "RDE";
-				else if(random == 2 || random == 3) return "LDE"
-				else if(random == 4) return "DT";
-				else return "LB";
+				else if(random == 2 || random == 3) return "LDE";
+				else return "DT";
 			}
 			else {
 				var random = Math.floor(Math.random() * 12)
@@ -116,28 +125,29 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 		}
 		
 		moveDefender() {
-			var success = false;
-			while(success == false) {
-				var defender = this.selectRandomDefender();
-				var smallest = null;
-				if(this.defenders[defender].currentTile.x + 1 < 10) {
-					smallest = this.findSmallestFScore(smallest, this.tiles[this.defenders[defender].currentTile.y][this.defenders[defender].currentTile.x+1]);
+			if(this.ballSnapped == true) {
+				var success = false;
+				while(success == false) {
+					var defender = this.selectRandomDefender();
+					var smallest = null;
+					if(this.defenders[defender].currentTile.x + 1 < 10) {
+						smallest = this.findSmallestFScore(smallest, this.tiles[this.defenders[defender].currentTile.y][this.defenders[defender].currentTile.x+1]);
+					}
+					if(this.defenders[defender].currentTile.x - 1 > 0) {
+						smallest = this.findSmallestFScore(smallest, this.tiles[this.defenders[defender].currentTile.y][this.defenders[defender].currentTile.x-1]);
+					}
+					if(this.defenders[defender].currentTile.y + 1 < 3) {
+						smallest = this.findSmallestFScore(smallest, this.tiles[this.defenders[defender].currentTile.y + 1][this.defenders[defender].currentTile.x]);
+					}
+					if(this.defenders[defender].currentTile.y - 1 > -1) {
+						smallest = this.findSmallestFScore(smallest, this.tiles[this.defenders[defender].currentTile.y - 1][this.defenders[defender].currentTile.x]);
+					}
+					if(smallest.fScore <= this.defenders[defender].reactZone) {
+						success = true;
+					}
 				}
-				if(this.defenders[defender].currentTile.x - 1 > 0) {
-					smallest = this.findSmallestFScore(smallest, this.tiles[this.defenders[defender].currentTile.y][this.defenders[defender].currentTile.x-1]);
-				}
-				if(this.defenders[defender].currentTile.y + 1 < 3) {
-					smallest = this.findSmallestFScore(smallest, this.tiles[this.defenders[defender].currentTile.y + 1][this.defenders[defender].currentTile.x]);
-				}
-				if(this.defenders[defender].currentTile.y - 1 > -1) {
-					smallest = this.findSmallestFScore(smallest, this.tiles[this.defenders[defender].currentTile.y - 1][this.defenders[defender].currentTile.x]);
-				}
-
-				if(smallest.fScore <= this.defenders[defender].reactZone) {
-					success = true;
-				}
+				this.determineOutcomeDefender(this.checkOccupiedTiles(smallest.id, 1), smallest, defender);
 			}
-			this.determineOutcomeDefender(this.checkOccupiedTiles(smallest.id, 1), smallest, defender);
 		}
 		
 		findSmallestFScore(currentValue, newValue) {
@@ -145,21 +155,24 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			else return currentValue;
 		}
 		
-		runRoute() {
-			var path = this.wr.selectRandomRoute();
-			(function(game, routePath){
-				var interval = setInterval(function(){
-					console.log(game.player.canPass);
-					if(routePath.length > 0 && game.player.canPass == true) {
-						var node = routePath.shift();
-						game.wr.move(game.tiles[node.y][node.x])
-					}
-					else {
-						clearInterval(interval);
-					}
-				}, 1000);
+		runRoute(route) {
+			var path;
+			if(route) path = route;
+			else path = this.wr.selectRandomRoute();
+			(function(game, routePath) {
+				if(routePath.length > 0 && game.player.canPass == true) {
+					var node;
+					var occupied = game.checkOccupiedTiles(game.tiles[routePath[0].y][routePath[0].x].id, 0);
+					console.log(occupied);
+					if(occupied == 0) node = routePath[0]; 
+					else node = routePath.shift();
+					game.wr.move(game.tiles[node.y][node.x]);
+					setTimeout(function(){game.runRoute(routePath);}, game.wr.interval);
+				}
 			}(this, path));
 		}
+		
+		
 		
 		ballIntercepted() {
 			alert("Picked Off!");
@@ -201,15 +214,16 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 					if(!this.ballSnapped) {
 						this.player.canPass = true;
 						this.ballSnapped = true;
-						this.runRoute();
 						(function(game){
-							var interval = setInterval(function(){
-								console.log(game.player.canPass);
-								if(game.ballSnapped == false) clearInterval(interval);
-								else if(game.player.canPass == false) game.moveDefender();
-								else game.moveDefender();
-							}, 1000);
+							setTimeout(function(){game.runRoute(null);}, game.wr.interval);
 						}(this));
+						this.moveDefender();
+						var tile = this.defenders.LB.enterThrowingLane(this);
+						(function(game, tile){
+							setTimeout(function(){
+								if(game.ballSnapped == true)game.defenders.LB.move(tile);
+							}, 3000);
+						}(this, tile));
 					}
 					break;
 				}
