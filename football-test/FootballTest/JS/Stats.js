@@ -1,27 +1,19 @@
 define (["JS/Drive.js","JS/Play.js"],function(Drive, Play) {
 	return class Stats {
 		constructor() {
-			this.playsRun = 0;
 			this.drives = [];
-			this.currentPlay = null;
 			this.currentDrive = null;
 			this.clock = null;
 		}
 		
-		beginPlay() {
-			
+		createDrive(start) {
+			this.currentDrive = new Drive(start);
+			//this.currentDrive.startTime = this.clock.currentTime();
 		}
 		
-		endPlay() {
-			
-		}
-		
-		createDrive() {
-			
-		}
-		
-		endDrive() {
-			
+		endDrive(result) {
+			this.currentDrive.driveResult = result;
+			//this.currentDrive.
 		}
 	}
 });
