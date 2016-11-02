@@ -1,19 +1,18 @@
-define (["JS/Drive.js","JS/Play.js"],function(Drive, Play) {
+define (["JS/Drive.js","JS/Play.js", "JS/Clock.js"],function(Drive, Play, Clock) {
 	return class Stats {
 		constructor() {
 			this.drives = [];
 			this.currentDrive = null;
-			this.clock = null;
+			this.clock = new Clock();
 		}
 		
 		createDrive(start) {
-			this.currentDrive = new Drive(start);
-			//this.currentDrive.startTime = this.clock.currentTime();
+			this.currentDrive = new Drive(start, this.clock);
 		}
 		
 		endDrive(result) {
 			this.currentDrive.driveResult = result;
-			//this.currentDrive.
+			this.currentDrive.clock = null;
 		}
 	}
 });

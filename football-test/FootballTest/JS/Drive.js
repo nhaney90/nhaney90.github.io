@@ -1,6 +1,6 @@
 define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 	return class Drive {
-		constructor(yardLine) {
+		constructor(yardLine, clock) {
 			this.plays = [];
 			this.startingYardLine = yardLine;
 			this.driveResult = null;
@@ -15,11 +15,13 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 			this.currentDistance = 10;
 			this.currentYardLine = this.startingYardLine;
 			this.currentPlay = null;
+			this.clock = clock;
 		}
 		
 		startPlay() {
 			this.currentPlay = new Play();
-			//this.currentPlay.startTime = this.clock.currentTime();
+			this.clock.startTime();
+			this.currentPlay.startTime = this.clock.getCurrentTime();
 			this.currentPlay.down = this.currentDown;
 			this.currentPlay.distance = this.currentDistance;
 			this.currentPlay.yardLine = this.currentYardLine;
