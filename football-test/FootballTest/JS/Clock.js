@@ -4,9 +4,7 @@ define ([],function() {
 			this.totalQuarters = 4;
 			this.currentQuarter = 1;
 			this.quarterLength = 60;
-			this.currentTime = this.quarterLength;
-			this.remainingTime = this.currentTime;
-			this.started = false;
+			this.timeRemaining = this.quarterLength;
 		}
 		
 		runTimer(startTime) {

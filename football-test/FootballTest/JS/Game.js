@@ -13,6 +13,12 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			this.stats = new Stats();
 			this.stats.createDrive(85);
 			this.playPaused = false;
+			this.gameLoopCounter = 0;
+			this.gameLoopDefenderMove = 0;
+			this.currentKeyCode = null;
+			this.gameLoop();
+			this.curentDefender = null;
+			this.validKeys = [13,32,37,38,39,40];
 		}
 		
 		addDefenders() {
@@ -72,31 +78,18 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			}
 		}
 		
-		checkCode(code) {
-			switch(code) {
-				//enter - snap ball
-				case 13: {
-					if(this.playPaused) {
-						this.playPaused = false;
-						this.resetTokens();
-						this.setFieldTokens();
-						this.readUserInput();
-					}
-					else if(!this.ballSnapped) {
-						this.startPlay();
-					}
-					break;
-				}
+		checkCode() {
+			console.log(this.currentKeyCode);
+			switch(this.currentKeyCode) {
 				//space - pass ball
 				case 32: {
-					if(this.ballSnapped) {
-						if(this.player.canPass && this.ballInAir == false){
-							this.ballInAir = true;
-							this.stats.currentDrive.currentPlay.type = Enums.playType.pass;
-							(function(game){
-								game.player.pass(game).then(function(response) {console.log(response);game.checkBallStatus(response);});
-							}(this));
-						}
+					console.log("can pass");
+					if(this.player.canPass && this.ballInAir == false){
+						this.ballInAir = true;
+						this.stats.currentDrive.currentPlay.type = Enums.playType.pass;
+						(function(game){
+							game.player.pass(game).then(function(response) {console.log(response);game.checkBallStatus(response);});
+						}(this));
 					}
 					break;
 				}
@@ -109,6 +102,40 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 				//move down
 				case 40: this.movePlayer(Enums.playerMovement.down); break;
 			}
+			this.currentKeyCode = null;
+		}
+		
+		coreGameLogic() {
+			if(this.ballSnapped){
+				this.calculateFScores();
+				if(this.currentKeyCode) this.checkCode();
+				if(this.gameLoopCounter == 0) {
+					this.wr.selectRandomRoute();
+				}
+				else if(this.gameLoopCounter == 3 && this.player.canPass) {
+					//var tile = this.defenders.LB.enterThrowingLane(this);
+					//this.defenders.LB.move(tile);
+				}
+				else if(this.gameLoopCounter == 7) {
+					this.moveDefender();
+				}
+				else if(this.gameLoopCounter == 9) {
+					if(!this.wr.halt) this.runRoute();
+					this.stats.clock.timeRemaining--;
+					this.gameLoopCounter = 0;
+				}
+				this.gameLoopCounter++;
+			}
+			else if(this.currentKeyCode == 13){
+				this.startPlay();
+			}
+			
+			/*if(this.playPaused) {
+						this.playPaused = false;
+						this.resetTokens();
+						this.setFieldTokens();
+						this.readUserInput();
+					}*/
 		}
 		
 		createField(div) {
@@ -128,13 +155,13 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			}
 		}
 		
-		determineOutcomeDefender(status, tile, defender) {
+		determineOutcomeDefender(status, tile) {
 			if(status == Enums.tileEnum.player && this.ballInAir == false) this.tackled();
 			else if(status == Enums.tileEnum.open) {
-				this.defenders[defender].move(tile);
-				(function(game, defender){
+				this.currentDefender.move(tile);
+				/*(function(game){
 					setTimeout(function(){game.moveDefender();}, game.defenders[defender].interval);
-				}(this, defender));
+				}(this));*/
 			}
 			else this.moveDefender();
 		}
@@ -158,59 +185,63 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			else return currentValue;
 		}
 		
+		gameLoop() {
+			(function(game){
+				setInterval(function(){
+					game.coreGameLogic();
+				}, 100);
+			}(this));
+		}
+		
 		moveDefender() {
-			if(this.ballSnapped == true) {
-				var success = false;
-				while(success == false) {
-					var defender = this.selectRandomDefender();
-					var smallest = null;
-					if(this.defenders[defender].currentTile.x + 1 < 10) {
-						smallest = this.findSmallestFScore(smallest, this.tiles[this.defenders[defender].currentTile.y][this.defenders[defender].currentTile.x+1]);
-					}
-					if(this.defenders[defender].currentTile.x - 1 > 0) {
-						smallest = this.findSmallestFScore(smallest, this.tiles[this.defenders[defender].currentTile.y][this.defenders[defender].currentTile.x-1]);
-					}
-					if(this.defenders[defender].currentTile.y + 1 < 3) {
-						smallest = this.findSmallestFScore(smallest, this.tiles[this.defenders[defender].currentTile.y + 1][this.defenders[defender].currentTile.x]);
-					}
-					if(this.defenders[defender].currentTile.y - 1 > -1) {
-						smallest = this.findSmallestFScore(smallest, this.tiles[this.defenders[defender].currentTile.y - 1][this.defenders[defender].currentTile.x]);
-					}
-					if(smallest.fScore <= this.defenders[defender].reactZone) {
-						success = true;
-					}
+			var success = false;
+			while(success == false) {
+				var smallest = null;
+				this.currentDefender = this.defenders[this.selectRandomDefender()];
+				if(this.currentDefender.currentTile.x + 1 < 10) {
+					smallest = this.findSmallestFScore(smallest, this.tiles[this.currentDefender.currentTile.y][this.currentDefender.currentTile.x+1]);
 				}
-				this.determineOutcomeDefender(this.checkOccupiedTiles(smallest.id, Enums.tokenEnum.defender), smallest, defender);
+				if(this.currentDefender.currentTile.x - 1 > 0) {
+					smallest = this.findSmallestFScore(smallest, this.tiles[this.currentDefender.currentTile.y][this.currentDefender.currentTile.x-1]);
+				}
+				if(this.currentDefender.currentTile.y + 1 < 3) {
+					smallest = this.findSmallestFScore(smallest, this.tiles[this.currentDefender.currentTile.y + 1][this.currentDefender.currentTile.x]);
+				}
+				if(this.currentDefender.currentTile.y - 1 > -1) {
+					smallest = this.findSmallestFScore(smallest, this.tiles[this.currentDefender.currentTile.y - 1][this.currentDefender.currentTile.x]);
+				}
+				if(smallest.fScore <= this.currentDefender.reactZone) {
+					success = true;
+				}
 			}
+			this.determineOutcomeDefender(this.checkOccupiedTiles(smallest.id, Enums.tokenEnum.defender), smallest);
 		}
 		
 		movePlayer(direction) {
-			if(this.ballSnapped) {
-				if(direction == Enums.playerMovement.left) {
-					if(this.player.currentTile.x == 0) {
-						this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][9].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y][9], direction);
-					}
-					else {
-						this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][this.player.currentTile.x - 1].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y][this.player.currentTile.x - 1], direction);
-					}
+			if(direction == Enums.playerMovement.left) {
+				if(this.player.currentTile.x == 0) {
+					this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][9].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y][9], direction);
 				}
-				else if(direction == Enums.playerMovement.up) {
-					if((this.player.currentTile.y - 1) > -1 && this.ballSnapped) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y - 1][this.player.currentTile.x].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y - 1][this.player.currentTile.x], direction);
+				else {
+					this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][this.player.currentTile.x - 1].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y][this.player.currentTile.x - 1], direction);
 				}
-				else if(direction == Enums.playerMovement.right) {
-					if(this.player.currentTile.x + 1 < 10 && this.ballSnapped) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][this.player.currentTile.x + 1].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y][this.player.currentTile.x + 1],direction);
-					else if(this.player.currentTile.x + 1 > 9 && this.ballSnapped && this.player.canPass == false) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][0].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y][0],direction);
-				}
-				else if(direction == Enums.playerMovement.down) {
-					if((this.player.currentTile.y + 1) < 3 && this.ballSnapped) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y + 1][this.player.currentTile.x].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y + 1][this.player.currentTile.x],direction);
-				}
+			}
+			else if(direction == Enums.playerMovement.up) {
+				if((this.player.currentTile.y - 1) > -1 && this.ballSnapped) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y - 1][this.player.currentTile.x].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y - 1][this.player.currentTile.x], direction);
+			}
+			else if(direction == Enums.playerMovement.right) {
+				if(this.player.currentTile.x + 1 < 10 && this.ballSnapped) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][this.player.currentTile.x + 1].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y][this.player.currentTile.x + 1],direction);
+				else if(this.player.currentTile.x + 1 > 9 && this.ballSnapped && this.player.canPass == false) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][0].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y][0],direction);
+			}
+			else if(direction == Enums.playerMovement.down) {
+				if((this.player.currentTile.y + 1) < 3 && this.ballSnapped) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y + 1][this.player.currentTile.x].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y + 1][this.player.currentTile.x],direction);
 			}
 		}
 		
 		readUserInput() {
 			(function(game){
 				$(window).on("keydown", function(evt) {
-					game.checkCode(evt.keyCode)
+					if(game.validKeys.indexOf(evt.keyCode) > -1) game.currentKeyCode = evt.keyCode;
 				});
 			}(this));
 		}
@@ -231,21 +262,15 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			this.defenders = {RDE:null,LDE:null,DT:null,LB:null,CB:null,FS:null}
 		}
 		
-		runRoute(route) {
-			var path;
-			if(route) path = route;
-			else path = this.wr.selectRandomRoute();
-			(function(game, routePath) {
-				if(routePath.length > 0 && game.player.canPass == true) {
-					var node;
-					var occupied = game.checkOccupiedTiles(game.tiles[routePath[0].y][routePath[0].x].id, Enums.tokenEnum.wr);
-					if(occupied == Enums.tileEnum.open) {
-						node = routePath.shift();
-						game.wr.move(game.tiles[node.y][node.x]);
-					}
-					setTimeout(function(){game.runRoute(routePath);}, game.wr.interval);
+		runRoute() {
+			if(this.wr.currentRoute.length > 0) {
+				var node = this.wr.currentRoute[0];
+				var occupied = this.checkOccupiedTiles(this.tiles[node.y][node.x].id, Enums.tokenEnum.wr);
+				if(occupied == Enums.tileEnum.open) {
+					this.wr.currentRoute.shift();
+					this.wr.move(this.tiles[node.y][node.x]);
 				}
-			}(this, path));
+			}
 		}
 		
 		selectRandomDefender() {
@@ -274,20 +299,9 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 		}
 		
 		startPlay() {
-			if(this.stats.clock.started == false) this.stats.clock.startTime();
 			this.player.canPass = true;
 			this.ballSnapped = true;
 			this.stats.currentDrive.startPlay();
-			(function(game){
-				setTimeout(function(){game.runRoute(null);}, game.wr.interval);
-			}(this));
-			this.moveDefender();
-			var tile = this.defenders.LB.enterThrowingLane(this);
-			(function(game, tile){
-				setTimeout(function(){
-					if(game.ballSnapped == true)game.defenders.LB.move(tile);
-				}, 3000);
-			}(this, tile));
 		}
 		
 		stopPlay(endedBy) {
@@ -303,10 +317,10 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 		}
 		
 		swapWRAndPlayer() {
-			this.wr.stopRoute();
 			this.player.canPass = false;
 			this.stats.currentDrive.currentPlay.yards += (this.player.currentTile.x - this.wr.currentTile.x);
 			this.player.move(this.wr.currentTile);
+			this.halt = true;
 		}
 		
 		tackled() {

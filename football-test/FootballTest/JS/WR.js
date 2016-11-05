@@ -6,8 +6,6 @@ define (["JS/Token.js"],function(Token) {
 			this.elementHTML = "<div id='wr' class='token wr'>WR</div>";
 			this.element = null;
 			this.currentTile = tile
-			//this.addElement(this.currentTile.element, this.elementHTML);
-			this.canPass = true;
 			this.lCurlRoute = [{x:5,y:2},{x:4,y:2},{x:3,y:2}];
 			this.lGoRoute = [{x:5,y:2},{x:4,y:2},{x:3,y:2},{x:2,y:2},{x:1,y:2}];
 			this.lCrossingRoute = [{x:5,y:2},{x:4,y:2},{x:3,y:2},{x:3,y:1},{x:3,y:0}];
@@ -18,7 +16,8 @@ define (["JS/Token.js"],function(Token) {
 			this.rDragRoute = [{x:5,y:0},{x:5,y:1},{x:5,y:2}];
 			this.routes=[this.lCurlRoute, this.lGoRoute, this.lCrossingRoute, this.lDragRoute, this.rCurlRoute, this.rGoRoute, this.rCrossingRoute, this.rDragRoute];
 			this.halt = false;
-			this.interval = 1000;
+			this.currentRoute = null;
+			
 		}
 		
 		stopRoute() {
@@ -28,7 +27,8 @@ define (["JS/Token.js"],function(Token) {
 
 		selectRandomRoute() {
 			var tempInt = Math.floor(Math.random() * 8)
-			return this.routes[tempInt];
+			this.currentRoute = this.routes[tempInt];
+			console.log(this.currentRoute);
 		}
 	}
 });
