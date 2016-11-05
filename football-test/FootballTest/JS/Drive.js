@@ -20,7 +20,6 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 		
 		startPlay() {
 			this.currentPlay = new Play();
-			this.clock.startTime();
 			this.currentPlay.startTime = this.clock.getCurrentTime();
 			this.currentPlay.down = this.currentDown;
 			this.currentPlay.distance = this.currentDistance;
@@ -45,15 +44,20 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 			if(this.currentDistance - this.currentPlay.yards <= 0) {
 				this.currentDown = 1;
 				this.currentDistance = 10;
+				this.currentPlay.result = Enums.playResult.firstDown;
 			}
 			else{
-				if(this.currentDown == 4) this.currentDown = 1;
+				if(this.currentDown == 4) this.currentPlay.result = Enums.playResult.turnover;
+				else if(this.currentYardLine >= 100) this.currentPlay.result = Enums.playResult.touchdown;
 				else {
 					this.currentDistance -= this.currentPlay.yards;
 					this.currentDown++;
+					this.currentPlay.result = Enums.playResult.none;
 				}
 			}
+			this.currentPlay.endTime = this.clock.getCurrentTime();
 			this.plays.push(this.currentPlay);
+			return this.currentPlay.result;
 		}
 		
 		setCurrentYardLine(yards) {

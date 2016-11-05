@@ -4,33 +4,38 @@ define ([],function() {
 			this.totalQuarters = 4;
 			this.currentQuarter = 1;
 			this.quarterLength = 60;
-			this.remainingTime = this.quarterLength;
+			this.currentTime = this.quarterLength;
+			this.remainingTime = this.currentTime;
+			this.started = false;
 		}
 		
 		runTimer(startTime) {
-			this.remainingTime = this.remainingTime - (((Date.now() - startTime/1000) | 0));
-			var seconds = (this.remainingTime % 60) | 0;
+			this.currentTime = this.remainingTime - (((Date.now() - startTime)/1000) | 0);
+			var seconds = (this.currentTime % 60) | 0;
 			
 			seconds = seconds < 10 ? "0" + seconds : seconds;
-			if(this.remainingTime <= 0) start = Date.now() + 1000;
-			console.log(seconds);
+			if(this.currentTime <= 0) startTime = Date.now() + 1000;
+			console.log(this.currentTime);
 		}
 		
 		startTime() {
-			var start= new Date();
+			var start = Date.now();
+			this.remainingTime = this.currentTime;
 			(function(drive) {
 				drive.interval = setInterval(function() {
 					drive.runTimer(start);
 				}, 1000);
 			})(this);
+			this.started = true;
 		}
 		
 		stopTime() {
-			clearInverval(this.interval);
+			clearInterval(this.interval);
+			this.started = false;
 		}
 		
 		getCurrentTime() {
-			return this.remainingTime;
+			return this.currentTime;
 		}
 	}
 });
