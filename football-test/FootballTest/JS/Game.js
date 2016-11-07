@@ -158,12 +158,12 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 		}
 		
 		determineOutcomeDefender(status, tile) {
-			if(status == Enums.tileEnum.player && this.ballInAir == false) this.tackled();
+			if(status == Enums.tileEnum.player && this.ballInAir == false) {
+				this.tackled();
+				this.currentDefender.addBlink();
+			}
 			else if(status == Enums.tileEnum.open) {
 				this.currentDefender.move(tile);
-				/*(function(game){
-					setTimeout(function(){game.moveDefender();}, game.defenders[defender].interval);
-				}(this));*/
 			}
 			else this.moveDefender();
 		}

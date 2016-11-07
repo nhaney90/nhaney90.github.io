@@ -15,16 +15,6 @@ define (["JS/Token.js", "JS/Ball.js"],function(Token, Ball) {
 			return new Promise(function(resolve, reject) {
 				resolve(ball.fly());
 			});
-		}
-		
-		addBlink() {
-			console.log("adsfasd");
-			$("#" + this.elementId).addClass("blink");
-		}
-		
-		removeBlink() {
-			$("#" + this.elementId).removeClass("blink");
-		}
-				
+		}	
 	}
 });

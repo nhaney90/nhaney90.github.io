@@ -111,6 +111,14 @@
 		margin-top: -10px;
 		margin-left: 15px;
 	}
+	.blink {
+		animation:blink 400ms infinite alternate;
+	}
+	
+	@keyframes blink {
+    from { opacity:1; }
+    to { opacity:0; }
+};
 </style>
 <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>

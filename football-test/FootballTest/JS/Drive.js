@@ -83,9 +83,9 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 		
 		getNormalizedYardLine() {
 			if(this.currentYardLine > 50) {
-				return 50-(this.currentYardLine - 50);
+				return "Opp " + (50-(this.currentYardLine - 50));
 			}
-			else return "Opp " + this.currentYardLine;
+			else return this.currentYardLine;
 		}
 	}
 });

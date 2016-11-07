@@ -17,5 +17,13 @@ define (["jquery"],function($) {
 			this.addElement(tile.element, this.elementHTML);
 			this.currentTile = tile
 		}
+		
+		addBlink() {
+			$("#" + this.elementId).addClass("blink");
+		}
+		
+		removeBlink() {
+			$("#" + this.elementId).removeClass("blink");
+		}		
 	}
 });
