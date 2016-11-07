@@ -12,7 +12,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			this.ballInAir = false;
 			this.stats = new Stats();
 			this.stats.createDrive(25);
-			this.playPaused = false;
+			this.playPaused = true;
 			this.gameLoopCounter = 0;
 			this.gameLoopDefenderMove = 0;
 			this.currentKeyCode = null;
@@ -111,6 +111,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 				if(this.currentKeyCode) this.checkCode();
 				if(this.gameLoopCounter == 0) {
 					this.wr.selectRandomRoute();
+					console.log(this.wr.currentRoute);
 				}
 				else if(this.gameLoopSeconds == 3 && this.player.canPass && this.defenders.LB.moved == false) {
 					var tile = this.defenders.LB.enterThrowingLane(this);
@@ -129,15 +130,19 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 				this.gameLoopCounter++;
 			}
 			else if(this.currentKeyCode == 13){
-				this.startPlay();
+				if(this.playPaused == true) {
+					console.log("read");
+					this.playPaused = false;
+					this.startPlay();
+				}
+				else {
+					this.resetTokens();
+					this.setFieldTokens();
+					this.playPaused = true;
+					this.gameLoopCounter = 0;
+					this.gameLoopSeconds = 0;
+				}
 			}
-			
-			/*if(this.playPaused) {
-						this.playPaused = false;
-						this.resetTokens();
-						this.setFieldTokens();
-						this.readUserInput();
-					}*/
 		}
 		
 		createField(div) {
@@ -249,7 +254,6 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 		}
 		
 		resetTokens() {
-			$(window).off();
 			this.player.removeElement(this.player.element);
 			this.player = null;
 			this.ball = null;
@@ -311,7 +315,6 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			this.wr.halt = true;
 			this.stats.clock.stopTime();
 			this.stats.checkDriveStatus(endedBy);
-			this.playPaused = true;
 		}
 		
 		swapWRAndPlayer() {

@@ -10,6 +10,9 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 			var result = this.currentDrive.addPlay(endedBy);
 			$("#playResult").text(result);
 			$("#playByPlayContainer").append('<h6 class="playByPlayItem">' + (this.createLabelFriendlyDownNumber(this.currentDrive.currentPlay.down)) + ' down: ' + result + '</h6>');
+			$("#yardLineLabel").text(this.currentDrive.getNormalizedYardLine(this.currentDrive.currentYardLine));
+			$("#downLabel").text(this.currentDrive.currentDown);
+			$("#distanceLabel").text(this.currentDrive.currentDistance);
 		}
 		
 		createDrive(start) {
