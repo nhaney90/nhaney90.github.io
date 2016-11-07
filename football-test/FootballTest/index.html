@@ -55,6 +55,8 @@
 		width: 260px;
 		margin: 20px;
 		height: 300px;
+		overflow: hidden;
+		overflow-y: scroll;
 	}
 	.column {
 		display:flex;
@@ -110,6 +112,7 @@
 	.playByPlayItem {
 		margin-top: -10px;
 		margin-left: 15px;
+		margin-right: 5px;
 	}
 	.blink {
 		animation:blink 400ms infinite alternate;
@@ -159,7 +162,7 @@
 			</th>
 			<th>
 				<div class="cellStyling" style="width:260px;">
-					<div id="timeLabel" style="font-size:45px; font-weight:bolder; letter-spacing:4px;">3:00</div>
+					<div id="timeLabel" style="font-size:45px; font-weight:bolder; letter-spacing:4px;"></div>
 				</div>	
 			</th>
 			<th>
@@ -173,19 +176,19 @@
 			<td>
 				<div class="cellStyling scoreLabels">
 					<p>Down</p>
-					<div id="downLabel" class="scoreValues">1</div>
+					<div id="downLabel" class="scoreValues"></div>
 				</div>
 			</td>
 			<td>
 				<div class="cellStyling scoreLabels">
 					<p>To Go</p>
-					<div id="distanceLabel" class="scoreValues">10</div>
+					<div id="distanceLabel" class="scoreValues"></div>
 				</div>	
 			</td>
 			<td>
 				<div class="cellStyling scoreLabels">
 					<p>Ball On</p>
-					<div id="yardLineLabel" class="scoreValues">25</div>
+					<div id="yardLineLabel" class="scoreValues"></div>
 				</div>	
 			</td>
 		  </tr>

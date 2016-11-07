@@ -5,6 +5,7 @@ define ([],function() {
 			this.currentQuarter = 1;
 			this.quarterLength = 180;
 			this.timeRemaining = this.quarterLength;
+			this.createTimeLabel();
 		}
 		
 		startTime() {
@@ -28,6 +29,9 @@ define ([],function() {
 			if(this.timeRemaining >= 60) {
 				minutes = Math.floor(this.timeRemaining / 60);
 				seconds = this.timeRemaining - (minutes * 60);
+				if(seconds < 10) {
+					seconds = "0" + seconds;
+				}
 			}
 			else seconds = this.timeRemaining;
 			$("#timeLabel").text(minutes + ":" + seconds);

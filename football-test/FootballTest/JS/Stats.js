@@ -4,24 +4,19 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 			this.drives = [];
 			this.currentDrive = null;
 			this.clock = new Clock();
+			this.setScoreboardLabels(1, 10, 25);
 		}
 		
 		checkDriveStatus(endedBy) {
 			var result = this.currentDrive.addPlay(endedBy);
 			$("#playResult").text(result);
 			$("#playByPlayContainer").append('<h6 class="playByPlayItem">' + (this.createLabelFriendlyDownNumber(this.currentDrive.currentPlay.down)) + ' down: ' + result + '</h6>');
-			$("#yardLineLabel").text(this.currentDrive.getNormalizedYardLine(this.currentDrive.currentYardLine));
-			$("#downLabel").text(this.currentDrive.currentDown);
-			$("#distanceLabel").text(this.currentDrive.currentDistance);
+			this.setScoreboardLabels(this.currentDrive.currentDown, this.currentDrive.currentDistance, this.currentDrive.getNormalizedYardLine(this.currentDrive.currentYardLine));
 		}
 		
 		createDrive(start) {
 			$("#playByPlayContainer").append('<h5 class="playByPlayHeading">Drive ' + (this.drives.length + 1) + '</h5>');
 			this.currentDrive = new Drive(start, this.clock);
-		}
-		
-		createPlayResultMessage() {
-			
 		}
 		
 		endDrive(result) {
@@ -36,6 +31,12 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 			else if(down == 3) return "3rd";
 			else if(down == 4) return "4th";
 			return "error";
+		}
+		
+		setScoreboardLabels(down, distance, yardLine) {
+			$("#yardLineLabel").text(yardLine);
+			$("#downLabel").text(down);
+			$("#distanceLabel").text(distance);
 		}
 	}
 });
