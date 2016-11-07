@@ -33,6 +33,7 @@ define (["JS/Token.js"],function(Token) {
 										if(ball.currentTile.x <7) {
 											clearInterval(intervalID);
 											ball.removeElement(ball.element);
+											ball.game.defenders[defender].addBlink();
 											resolve("intercepted");
 											break;
 										}

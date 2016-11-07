@@ -177,7 +177,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			else if(status == Enums.tileEnum.open) {
 				this.player.move(tile);
 				if(direction == Enums.playerMovement.left) this.stats.currentDrive.currentPlay.yards += 1;
-				else if(direction == Enums.playerMovement.left) this.stats.currentDrive.currentPlay.yards -=1;
+				else if(direction == Enums.playerMovement.right) this.stats.currentDrive.currentPlay.yards -=1;
 				if(tile.x < 7) {
 					this.player.canPass = false;
 					if(this.wr.element)this.wr.stopRoute();
