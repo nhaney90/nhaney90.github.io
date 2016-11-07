@@ -55,8 +55,10 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 			}
 			else {
 				this.currentPlay.playSummary = "Player " + (this.currentPlay.type == 0 ? "runs" : "passes") + " for " +  this.currentPlay.yards + " yards";
-				if(this.currentPlay.result == Enums.playResult.touchdown) {
+				console.log(endedBy);
+				if(endedBy == Enums.playEndedBy.touchdown) {
 					this.currentPlay.playSummary += " for a touchdown!";
+					this.currentPlay.result = Enums.playResult.touchdown;
 				}
 				else if(this.currentDistance - this.currentPlay.yards <= 0) {
 					this.currentDown = 1;

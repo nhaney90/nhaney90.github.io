@@ -30,9 +30,9 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 		}
 		
 		createDrive(start) {
-			this.setScoreboardLabels(1, 10, start);
 			$("#playByPlayContainer").append('<h5 class="playByPlayHeading">Drive ' + (this.drives.length + 1) + '</h5>');
 			this.currentDrive = new Drive(start, this.clock);
+			this.setScoreboardLabels(1, 10, this.currentDrive.getNormalizedYardLine(start));
 		}
 		
 		endDrive(result) {
