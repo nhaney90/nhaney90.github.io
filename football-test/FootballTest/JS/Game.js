@@ -80,7 +80,6 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 		}
 		
 		checkCode() {
-			console.log(this.currentKeyCode);
 			switch(this.currentKeyCode) {
 				//space - pass ball
 				case 32: {

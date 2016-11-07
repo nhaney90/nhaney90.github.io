@@ -41,12 +41,17 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 			this.setCurrentYardLine(this.currentPlay.yards);
 			if(endedBy == Enums.playEndedBy.sack) {
 				this.currentPlay.playSummary = "Player sacked for a loss of " + this.currentPlay.yards + " yards!";
+				this.currentDown++;
+				this.currentPlay.result = Enums.playResult.none;
 			}
 			else if(endedBy == Enums.playEndedBy.incomplete) {
 				this.currentPlay.playSummary = "Incomplete pass";
+				this.currentPlay.result = Enums.playResult.none;
+				this.currentDown++;
 			}
 			else if(endedBy == Enums.playEndedBy.interception) {
 				this.currentPlay.playSummary = "Player pass intercepted!";
+				this.currentPlay.result = Enums.playResult.turnover
 			}
 			else {
 				this.currentPlay.playSummary = "Player " + (this.currentPlay.type == 0 ? "runs" : "passes") + " for " +  this.currentPlay.yards + " yards";
@@ -74,7 +79,7 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 			}
 			this.currentPlay.endTime = this.clock.getCurrentTime();
 			this.plays.push(this.currentPlay);
-			return this.currentPlay.playSummary;
+			return {playSummary:this.currentPlay.playSummary, playResult: this.currentPlay.result};
 		}
 		
 		setCurrentYardLine(yards) {

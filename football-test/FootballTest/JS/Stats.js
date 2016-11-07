@@ -4,17 +4,33 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 			this.drives = [];
 			this.currentDrive = null;
 			this.clock = new Clock();
-			this.setScoreboardLabels(1, 10, 25);
+			this.score = {playerScore:0, computerScore:0};
+			this.setScore();
 		}
 		
 		checkDriveStatus(endedBy) {
 			var result = this.currentDrive.addPlay(endedBy);
-			$("#playResult").text(result);
-			$("#playByPlayContainer").append('<h6 class="playByPlayItem">' + (this.createLabelFriendlyDownNumber(this.currentDrive.currentPlay.down)) + ' down: ' + result + '</h6>');
-			this.setScoreboardLabels(this.currentDrive.currentDown, this.currentDrive.currentDistance, this.currentDrive.getNormalizedYardLine(this.currentDrive.currentYardLine));
+			$("#playResult").text(result.playSummary);
+			$("#playByPlayContainer").append('<h6 class="playByPlayItem">' + (this.createLabelFriendlyDownNumber(this.currentDrive.currentPlay.down)) + ' down: ' + result.playSummary + '</h6>');
+			if(result.playResult == Enums.playResult.turnover) {
+				this.score.computerScore += 7;
+				this.setScore();
+				this.endDrive();
+				this.createDrive();
+			}
+			else if(result.playResult == Enums.playResult.touchdown) {
+				this.score.playerScore += 7;
+				this.setScore();
+				this.endDrive();
+				this.createDrive();
+			}
+			else {
+				this.setScoreboardLabels(this.currentDrive.currentDown, this.currentDrive.currentDistance, this.currentDrive.getNormalizedYardLine(this.currentDrive.currentYardLine));
+			}
 		}
 		
 		createDrive(start) {
+			this.setScoreboardLabels(1, 10, start);
 			$("#playByPlayContainer").append('<h5 class="playByPlayHeading">Drive ' + (this.drives.length + 1) + '</h5>');
 			this.currentDrive = new Drive(start, this.clock);
 		}
@@ -37,6 +53,11 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 			$("#yardLineLabel").text(yardLine);
 			$("#downLabel").text(down);
 			$("#distanceLabel").text(distance);
+		}
+		
+		setScore() {
+			$("#playerScoreLabels").text(this.score.playerScore);
+			$("#computerScoreLabel").text(this.score.computerScore);
 		}
 	}
 });
