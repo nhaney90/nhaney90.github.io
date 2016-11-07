@@ -3,107 +3,114 @@
 <head>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 <style>
-#scoreBoard {
-    font-family: arial, sans-serif;
-    border-collapse: collapse;
-	width: 620px;
-	color: white;
-	background-color: black;
-	margin:10px;
-}
+	#scoreBoard {
+		font-family: arial, sans-serif;
+		border-collapse: collapse;
+		width: 620px;
+		color: white;
+		background-color: black;
+		margin:10px;
+	}
 
-td, th {
-    border: 1px solid #dddddd;
-    padding: 8px;
-	font-weight: bold;
-}
+	td, th {
+		border: 1px solid #dddddd;
+		font-weight: bold;
+	}
 
-td {
-	206px;
-}
+	td {
+		206px;
+	}
 
-.cellStyling {
-	text-align: center !important;
-}
+	.cellStyling {
+		text-align: center !important;
+	}
 
-.scoreValues {
-    font-size: 30px;
-    letter-spacing: 1.5px;
-    margin-top: -15px;
-}
-.scoreLabels {
-}
-.sidePanels {
-    width: 300px;
-    background-color: blue;
-    height: 400px;
-    margin-top: 60px;
-}
-.uiContainer {
-	display:flex;
-	margin:20px;
-}
-.sidePanelLabel {
-    margin: 10px;
-    font-size: 25px;
-    font-weight: bolder;
-    text-align: center;
-    color: white;
-}
-.sidePanelContainer {
-    background-color: white;
-    width: 300;
-    width: 260px;
-    margin: 20px;
-    height: 300px;
-}
-.column {
-	display:flex;
-	flex-direction:column;
-}
-.helpBtns{
-    margin: 10px;
-    font-size: 20px;
-}
-.headingStyle {
-	font-weight: bolder;
-}
+	.scoreValues {
+		font-size: 30px;
+		letter-spacing: 1.5px;
+		margin-top: -15px;
+	}
+	.scoreLabels {
+	}
+	.sidePanels {
+		width: 300px;
+		background-color: blue;
+		height: 400px;
+		margin-top: 60px;
+	}
+	.uiContainer {
+		display:flex;
+		margin:20px;
+	}
+	.sidePanelLabel {
+		margin: 10px;
+		font-size: 25px;
+		font-weight: bolder;
+		text-align: center;
+		color: white;
+	}
+	.sidePanelContainer {
+		background-color: white;
+		width: 300;
+		width: 260px;
+		margin: 20px;
+		height: 300px;
+	}
+	.column {
+		display:flex;
+		flex-direction:column;
+	}
+	.helpBtns{
+		margin: 10px;
+		font-size: 20px;
+	}
+	.headingStyle {
+		font-weight: bolder;
+	}
 
-		#tileContainer {
-			height: 100%;
-			width: 100%;
-			padding: 0px;
-			margin: 0px;
-		}
-		.tile{
-			height: 67px;
-			width: 67px;
-			background-color: green;
-			color: white;
-			position: relative;
-		}
-		.token {
-			height: 100%;
-			width: 100%;
-			color: white;
-			top: 0px;
-			left: 0px;
-			position: absolute;
-		}
-		.player {
-			background-color: black;
-		}
-		.wr {
-			background-color: red;
-		}
-		.ball {
-			background-color: brown;
-			z-index: 100;
-		}
-		.defender {
-			background-color: blue;
-			z-index: 100;
-		}
+	#tileContainer {
+		height: 100%;
+		width: 100%;
+		padding: 0px;
+		margin: 0px;
+	}
+	.tile{
+		height: 67px;
+		width: 67px;
+		background-color: green;
+		color: white;
+		position: relative;
+	}
+	.token {
+		height: 100%;
+		width: 100%;
+		color: white;
+		top: 0px;
+		left: 0px;
+		position: absolute;
+	}
+	.player {
+		background-color: black;
+	}
+	.wr {
+		background-color: red;
+	}
+	.ball {
+		background-color: brown;
+		z-index: 100;
+	}
+	.defender {
+		background-color: blue;
+		z-index: 100;
+	}
+	.playByPlayHeading {
+		font-weight: bold;
+		padding: 5px;
+	}
+	.playByPlayItem {
+		margin-top: -10px;
+		margin-left: 15px;
+	}
 </style>
 <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
@@ -139,18 +146,18 @@ td {
 			<th>
 				<div class="cellStyling scoreLabels" style="width:180px;">
 					<p style="font-size: 22px;letter-spacing: 2px;">Player</p>
-					<div id="playerScoreLabels" class="scoreValues">24</div>
+					<div id="playerScoreLabels" class="scoreValues">0</div>
 				</div>
 			</th>
 			<th>
 				<div class="cellStyling" style="width:260px;">
-					<div id="timeLabel" style="font-size:45px; font-weight:bolder; letter-spacing:4px;">2:15</div>
+					<div id="timeLabel" style="font-size:45px; font-weight:bolder; letter-spacing:4px;">3:00</div>
 				</div>	
 			</th>
 			<th>
 				<div class="cellStyling scoreLabels" style="width:180px;">
 					<p style="font-size: 20px;letter-spacing: 2px;">Computer</p>
-					<div id="computerScoreLabel" class="scoreValues">13</div>
+					<div id="computerScoreLabel" class="scoreValues">0</div>
 				</div>	
 			</th>
 		  </tr>
@@ -158,38 +165,37 @@ td {
 			<td>
 				<div class="cellStyling scoreLabels">
 					<p>Down</p>
-					<div id="downLabel" class="scoreValues">2</div>
+					<div id="downLabel" class="scoreValues">1</div>
 				</div>
 			</td>
 			<td>
 				<div class="cellStyling scoreLabels">
 					<p>To Go</p>
-					<div id="distanceLabel" class="scoreValues">8</div>
+					<div id="distanceLabel" class="scoreValues">10</div>
 				</div>	
 			</td>
 			<td>
 				<div class="cellStyling scoreLabels">
 					<p>Ball On</p>
-					<div id="yardLineLabel" class="scoreValues">45</div>
+					<div id="yardLineLabel" class="scoreValues">25</div>
 				</div>	
 			</td>
 		  </tr>
 		</table>
 		<div id="fieldContainer" style="margin:10px"></div>
-		<div id="nextPlayDiv" style="display:flex; font-size:25px; font-weight:bolder; margin-top:20px; margin-left:10px;">
-			<div>Next Play:</div>
-			<div id="playResult">  Deep Post Right</div>
+		<div id="currentPlayDiv" style="display:flex; font-size:25px; font-weight:bolder; margin-top:20px; margin-left:10px;">
+			<div>Current Play:&nbsp</div>
+			<div id="currentPlay"></div>
 		</div>
 		<div id="playResultDiv" style="display:flex; font-size:25px; font-weight:bolder; margin-top:20px; margin-left:10px;">
-			<div>Play Result:</div>
-			<div id="playResult">  First Down</div>
+			<div>Play Result:&nbsp</div>
+			<div id="playResult"></div>
 		</div>
 	</div>
 	<div id="rightColumn" class="column">
 		<div id="playByPlayDiv" class="sidePanels">
 			<div class="sidePanelLabel">Play by Play</div>
-			<div id="playByPlayContainer" class="sidePanelContainer">
-			</div>
+			<div id="playByPlayContainer" class="sidePanelContainer"></div>
 		</div>
 		<button id="showRulesBtn" class="helpBtns btn btn-default" data-target = "#rulesModal" data-toggle = "modal">How To Play</button>
 	</div>

@@ -9,6 +9,7 @@ define (["JS/Defender.js"],function(Defender) {
 			this.addElement(this.currentTile.element, this.elementHTML);
 			this.reactZone=5;
 			this.interval=800;
+			this.moved = false;
 		}
 		
 		enterThrowingLane(game) {

@@ -11,13 +11,14 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			this.player = null;
 			this.ballInAir = false;
 			this.stats = new Stats();
-			this.stats.createDrive(85);
+			this.stats.createDrive(25);
 			this.playPaused = false;
 			this.gameLoopCounter = 0;
 			this.gameLoopDefenderMove = 0;
 			this.currentKeyCode = null;
 			this.gameLoop();
 			this.curentDefender = null;
+			this.gameLoopSeconds = 0;
 			this.validKeys = [13,32,37,38,39,40];
 		}
 		
@@ -83,12 +84,11 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			switch(this.currentKeyCode) {
 				//space - pass ball
 				case 32: {
-					console.log("can pass");
 					if(this.player.canPass && this.ballInAir == false){
 						this.ballInAir = true;
 						this.stats.currentDrive.currentPlay.type = Enums.playType.pass;
 						(function(game){
-							game.player.pass(game).then(function(response) {console.log(response);game.checkBallStatus(response);});
+							game.player.pass(game).then(function(response) {game.checkBallStatus(response);});
 						}(this));
 					}
 					break;
@@ -112,17 +112,19 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 				if(this.gameLoopCounter == 0) {
 					this.wr.selectRandomRoute();
 				}
-				else if(this.gameLoopCounter == 3 && this.player.canPass) {
-					//var tile = this.defenders.LB.enterThrowingLane(this);
-					//this.defenders.LB.move(tile);
+				else if(this.gameLoopSeconds == 3 && this.player.canPass && this.defenders.LB.moved == false) {
+					var tile = this.defenders.LB.enterThrowingLane(this);
+					this.defenders.LB.move(tile);
+					this.defenders.LB.moved=true;
 				}
 				else if(this.gameLoopCounter == 7) {
 					this.moveDefender();
 				}
 				else if(this.gameLoopCounter == 9) {
 					if(!this.wr.halt) this.runRoute();
-					this.stats.clock.timeRemaining--;
+					this.stats.clock.decrementTime();
 					this.gameLoopCounter = 0;
+					this.gameLoopSeconds++;
 				}
 				this.gameLoopCounter++;
 			}
@@ -263,11 +265,11 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 		}
 		
 		runRoute() {
-			if(this.wr.currentRoute.length > 0) {
-				var node = this.wr.currentRoute[0];
+			if(this.wr.currentRoute.nodes.length > 0) {
+				var node = this.wr.currentRoute.nodes[0];
 				var occupied = this.checkOccupiedTiles(this.tiles[node.y][node.x].id, Enums.tokenEnum.wr);
 				if(occupied == Enums.tileEnum.open) {
-					this.wr.currentRoute.shift();
+					this.wr.currentRoute.nodes.shift();
 					this.wr.move(this.tiles[node.y][node.x]);
 				}
 			}
@@ -308,11 +310,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			this.ballSnapped = false;
 			this.wr.halt = true;
 			this.stats.clock.stopTime();
-			if(endedBy == Enums.playEndedBy.tackle) alert("Tackled!");
-			else if(endedBy == Enums.playEndedBy.sack) alert("Sacked!");
-			else if(endedBy == Enums.playEndedBy.interception) alert("Interception!");
-			else if(endedBy == Enums.playEndedBy.incomplete) alert("Pass Incomplete");
-			this.stats.checkDriveStatus();
+			this.stats.checkDriveStatus(endedBy);
 			this.playPaused = true;
 		}
 		

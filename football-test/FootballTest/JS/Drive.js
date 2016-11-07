@@ -27,12 +27,10 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 		}
 		
 		stopPlay(yards) {
-			//this.currentPlay.result = result;
-			//this.currentPlay.type = type
 			this.addPlay();
 		}
 		
-		addPlay() {
+		addPlay(endedBy) {
 			this.totalPlays++;
 			this.yards += this.currentPlay.yards;
 			if(this.currentPlay.type) this.passPlays++;
@@ -41,27 +39,53 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 				this.runPlays++;
 			}
 			this.setCurrentYardLine(this.currentPlay.yards);
-			if(this.currentDistance - this.currentPlay.yards <= 0) {
-				this.currentDown = 1;
-				this.currentDistance = 10;
-				this.currentPlay.result = Enums.playResult.firstDown;
+			if(endedBy == Enums.playEndedBy.sack) {
+				this.currentPlay.playSummary = "Player sacked for a loss of " + this.currentPlay.yards + " yards!";
 			}
-			else{
-				if(this.currentDown == 4) this.currentPlay.result = Enums.playResult.turnover;
-				else if(this.currentYardLine >= 100) this.currentPlay.result = Enums.playResult.touchdown;
+			else if(endedBy == Enums.playEndedBy.incomplete) {
+				this.currentPlay.playSummary = "Incomplete pass";
+			}
+			else if(endedBy == Enums.playEndedBy.interception) {
+				this.currentPlay.playSummary = "Player pass intercepted!";
+			}
+			else {
+				this.currentPlay.playSummary = "Player " + (this.currentPlay.type == 0 ? "runs" : "passes") + " for " +  this.currentPlay.yards + " yards";
+				if(this.currentPlay.result == Enums.playResult.touchdown) {
+					this.currentPlay.playSummary += " for a touchdown!";
+				}
+				else if(this.currentDistance - this.currentPlay.yards <= 0) {
+					this.currentDown = 1;
+					this.currentDistance = 10;
+					this.currentPlay.result = Enums.playResult.firstDown;
+					this.currentPlay.playSummary += " for a first down!";
+				}
 				else {
 					this.currentDistance -= this.currentPlay.yards;
 					this.currentDown++;
 					this.currentPlay.result = Enums.playResult.none;
+					this.currentPlay.playSummary += " to the " + (this.getNormalizedYardLine());;
+				}
+			}	
+			if(this.currentDown == 4) {
+				if(this.currentPlay.result == Enums.playResult.none || this.currentPlay.result == Enums.playResult.incomplete) {
+					this.currentPlay.result = Enums.playResult.turnover;
+					this.currentPlay.playSummary += ". Turnover on downs!";
 				}
 			}
 			this.currentPlay.endTime = this.clock.getCurrentTime();
 			this.plays.push(this.currentPlay);
-			return this.currentPlay.result;
+			return this.currentPlay.playSummary;
 		}
 		
 		setCurrentYardLine(yards) {
 			this.currentYardLine += yards;
+		}
+		
+		getNormalizedYardLine() {
+			if(this.currentYardLine > 50) {
+				return 50-(this.currentYardLine - 50);
+			}
+			else return "Opp " + this.currentYardLine;
 		}
 	}
 });

@@ -14,7 +14,7 @@ define (["JS/Token.js"],function(Token) {
 			this.rGoRoute = [{x:5,y:0},{x:4,y:0},{x:3,y:0},{x:2,y:0},{x:1,y:0}];
 			this.rCrossingRoute = [{x:5,y:0},{x:4,y:0},{x:3,y:0},{x:3,y:1},{x:3,y:2}];
 			this.rDragRoute = [{x:5,y:0},{x:5,y:1},{x:5,y:2}];
-			this.routes=[this.lCurlRoute, this.lGoRoute, this.lCrossingRoute, this.lDragRoute, this.rCurlRoute, this.rGoRoute, this.rCrossingRoute, this.rDragRoute];
+			this.routes=[{nodes:this.lCurlRoute,name:"Left Curl"}, {nodes:this.lGoRoute,name:"Streak Left"}, {nodes:this.lCrossingRoute,name:"Left Deep Cross"}, {nodes:this.lDragRoute,name:"Left Drag"}, {nodes:this.rCurlRoute,name:"Right Curl"}, {nodes:this.rGoRoute,name:"Streak Right"}, {nodes:this.rCrossingRoute,name:"Right Deep Cross"}, {nodes:this.rDragRoute,names:"Right Drag"}];
 			this.halt = false;
 			this.currentRoute = null;
 			
@@ -23,12 +23,13 @@ define (["JS/Token.js"],function(Token) {
 		stopRoute() {
 			this.removeElement(this.element);
 			this.halt = true;
+			$("#currentPlay").text("");
 		}
 
 		selectRandomRoute() {
 			var tempInt = Math.floor(Math.random() * 8)
 			this.currentRoute = this.routes[tempInt];
-			console.log(this.currentRoute);
+			$("#currentPlay").text(this.currentRoute.name);
 		}
 	}
 });

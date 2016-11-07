@@ -9,6 +9,7 @@ define ([],function() {
 			this.distance = null;
 			this.yardLine = null;
 			this.type = null;
+			this.playSummary = null;
 		}
 	}
 });
