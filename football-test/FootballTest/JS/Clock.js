@@ -8,12 +8,6 @@ define ([],function() {
 			this.createTimeLabel();
 		}
 		
-		startTime() {
-		}
-		
-		stopTime() {
-		}
-		
 		getCurrentTime() {
 			return this.currentTime;
 		}

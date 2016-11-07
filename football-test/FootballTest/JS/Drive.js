@@ -84,6 +84,7 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 		
 		setCurrentYardLine(yards) {
 			this.currentYardLine += yards;
+			console.log(this.currentYardLine += yards);
 		}
 		
 		getNormalizedYardLine() {

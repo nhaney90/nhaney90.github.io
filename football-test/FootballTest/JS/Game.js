@@ -312,7 +312,6 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 		stopPlay(endedBy) {
 			this.ballSnapped = false;
 			this.wr.halt = true;
-			this.stats.clock.stopTime();
 			this.stats.checkDriveStatus(endedBy);
 		}
 		
