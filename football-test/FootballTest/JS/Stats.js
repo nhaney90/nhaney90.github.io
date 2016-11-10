@@ -75,7 +75,7 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 			$("#sacksCell").text(this.boxScore.sacks);
 			$("#rushingYardsCell").text(this.boxScore.rushing);
 			$("#rushingAttsCell").text(this.boxScore.rushAtts);
-			$("#yprCell").text(Math.round((this.boxScore.rushing / this.boxScore.compAtt.atts) * 10) / 10);
+			$("#yprCell").text(Math.round((this.boxScore.rushing / this.boxScore.rushAtts) * 10) / 10);
 			$("#rushingTdsCell").text(this.boxScore.rushTds);
 			$("#firstDownsCell").text(this.boxScore.firstDowns);
 			$("#byRushingCell").text(this.boxScore.byRushing);
