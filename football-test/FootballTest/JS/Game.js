@@ -108,11 +108,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			if(this.ballSnapped){
 				this.calculateFScores();
 				if(this.currentKeyCode) this.checkCode();
-				if(this.gameLoopCounter == 0) {
-					this.wr.selectRandomRoute();
-					console.log(this.wr.currentRoute);
-				}
-				else if(this.gameLoopSeconds == 3 && this.player.canPass && this.defenders.LB.moved == false) {
+				if(this.gameLoopSeconds == 3 && this.player.canPass && this.defenders.LB.moved == false) {
 					var tile = this.defenders.LB.enterThrowingLane(this);
 					this.defenders.LB.move(tile);
 					this.defenders.LB.moved=true;
@@ -184,7 +180,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 					if(this.wr.element)this.wr.stopRoute();
 				}
 				if(this.stats.currentDrive.currentPlay.yards + this.stats.currentDrive.currentYardLine >= 100) this.stopPlay(Enums.playEndedBy.touchdown);
-				this.calculateFScores();
+				else this.calculateFScores();
 			}
 		}
 		
@@ -319,9 +315,9 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 		
 		swapWRAndPlayer() {
 			this.player.canPass = false;
-			this.stats.currentDrive.currentPlay.yards += (this.player.currentTile.x - this.wr.currentTile.x);
 			this.player.move(this.wr.currentTile);
-			this.halt = true;
+			this.stats.currentDrive.currentPlay.yards += (this.player.currentTile.x - this.wr.currentTile.x);
+			if(this.stats.currentDrive.currentPlay.yards + this.stats.currentDrive.currentYardLine >= 100) this.stopPlay(Enums.playEndedBy.touchdown);
 		}
 		
 		tackled() {

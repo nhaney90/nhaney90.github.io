@@ -17,6 +17,7 @@ define (["JS/Token.js"],function(Token) {
 			this.routes=[{nodes:this.lCurlRoute,name:"Left Curl"}, {nodes:this.lGoRoute,name:"Streak Left"}, {nodes:this.lCrossingRoute,name:"Left Deep Cross"}, {nodes:this.lDragRoute,name:"Left Drag"}, {nodes:this.rCurlRoute,name:"Right Curl"}, {nodes:this.rGoRoute,name:"Streak Right"}, {nodes:this.rCrossingRoute,name:"Right Deep Cross"}, {nodes:this.rDragRoute,name:"Right Drag"}];
 			this.halt = false;
 			this.currentRoute = null;
+			this.selectRandomRoute();
 			
 		}
 		
