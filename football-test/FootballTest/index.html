@@ -10,15 +10,7 @@
 		color: white;
 		background-color: black;
 		margin:10px;
-	}
-
-	td, th {
-		border: 1px solid #dddddd;
 		font-weight: bold;
-	}
-
-	td {
-		206px;
 	}
 
 	.cellStyling {
@@ -82,6 +74,7 @@
 		background-color: green;
 		color: white;
 		position: relative;
+		border: 1px solid #dddddd;
 	}
 	.token {
 		height: 100%;
@@ -117,6 +110,12 @@
 	.blink {
 		animation:blink 400ms infinite alternate;
 	}
+	.boxscoreBoldHeadings {
+		font-weight:bolder;
+	}
+	.boxscoreHeadings {
+		text-indent:1em;
+	}
 	
 	@keyframes blink {
     from { opacity:1; }
@@ -147,7 +146,77 @@
 	<div id="leftColumn" class="column">
 		<div id="gameStatsDiv" class="sidePanels">
 			<div class="sidePanelLabel">Game Stats</div>
-			<div id="gameStatsContainer" class="sidePanelContainer"></div>
+			<div id="gameStatsContainer" class="sidePanelContainer">	
+				<table class = "table table-striped">
+					<tbody>
+						<tr class="boxscoreBoldHeadings">
+							<td>Total Yards</td>
+							<td id="totalYardsCell"></td>
+						</tr>
+						<tr class="boxscoreBoldHeadings">
+							<td>Passing</td>
+							<td id="passingYardsCell"></td>
+						</tr>
+						<tr>
+							<td class="boxscoreHeadings" >Comp Atts</td>
+							<td id="compAttsCell" ></td>
+						</tr>
+						<tr>
+							<td class="boxscoreHeadings">Yards Per Pass</td>
+							<td id="yppCell" ></td>
+						</tr>
+						<tr>
+							<td class="boxscoreHeadings">Touchdowns</td>
+							<td id="passingTdsCell"></td>
+						</tr>
+						<tr>
+							<td class="boxscoreHeadings">Interceptions</td>
+							<td id="interceptionsCell"></td>
+						</tr>
+						<tr>
+							<td class="boxscoreHeadings">Sacks</td>
+							<td id="sacksCell"></td>
+						</tr>
+						<tr class="boxscoreBoldHeadings">
+							<td>Rushing</td>
+							<td id="rushingYardsCell"></td>
+						</tr>
+						<tr>
+							<td class="boxscoreHeadings">Rushing Atts</td>
+							<td id="rushingAttsCell"></td>
+						</tr>
+						<tr>
+							<td class="boxscoreHeadings">Yards Per Rush</td>
+							<td id="yprCell"></td>
+						</tr>
+						<tr>
+							<td class="boxscoreHeadings">Touchdowns</td>
+							<td id="rushingTdsCell"></td>
+						</tr>
+						<tr class="boxscoreBoldHeadings">
+							<td>1st Downs</td>
+							<td id="firstDownsCell"></td>
+						</tr>
+						<tr>
+							<td class="boxscoreHeadings">By Rushing</td>
+							<td id="byRushingCell"></td>
+						</tr>
+						<tr>
+							<td class="boxscoreHeadings">By Passing</td>
+							<td id="byPassingCell"></td>
+						</tr>
+						<tr class="boxscoreBoldHeadings">
+							<td>3rd Downs</td>
+							<td id="thirdDownsCell"></td>
+						</tr>
+						<tr class="boxscoreBoldHeadings">
+							<td>4th Downs</td>
+							<td id="fourthDownsCell"></td>
+						</tr>
+				   </tbody>
+				   
+				</table>
+			</div>
 		</div>
 		<button id="showControlsBtn" class="helpBtns btn btn-default" data-target = "#controlsModal" data-toggle = "modal">Controls</button>
 	</div>

@@ -30,41 +30,55 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 			this.addPlay();
 		}
 		
-		addPlay(endedBy) {
+		addPlay(endedBy, boxScore) {
 			this.totalPlays++;
 			this.yards += this.currentPlay.yards;
-			if(this.currentPlay.type) this.passPlays++;
+			if(this.currentPlay.type) {
+				this.passPlays++;
+				boxScore.compAtt.atts++;
+				boxScore.compAtt.comp++;
+			}
 			else {
 				this.currentPlay.type = Enums.playType.run;
 				this.runPlays++;
+				boxScore.rushAtts++;
+				boxScore.rushing += this.currentPlay.yards;
 			}
 			this.setCurrentYardLine(this.currentPlay.yards);
 			if(endedBy == Enums.playEndedBy.sack) {
 				this.currentPlay.playSummary = "Player sacked for a loss of " + this.currentPlay.yards + " yards!";
 				this.currentDown++;
 				this.currentPlay.result = Enums.playResult.none;
+				boxScore.sacks++;
 			}
 			else if(endedBy == Enums.playEndedBy.incomplete) {
 				this.currentPlay.playSummary = "Incomplete pass";
 				this.currentPlay.result = Enums.playResult.none;
 				this.currentDown++;
+				boxScore.compAtt.comp--;
 			}
 			else if(endedBy == Enums.playEndedBy.interception) {
 				this.currentPlay.playSummary = "Player pass intercepted!";
 				this.currentPlay.result = Enums.playResult.turnover
+				boxScore.compAtt.comp--;
+				boxScore.interceptions++;
 			}
 			else {
 				this.currentPlay.playSummary = "Player " + (this.currentPlay.type == 0 ? "runs" : "passes") + " for " +  this.currentPlay.yards + " yards";
-				console.log(endedBy);
+				if(this.currentPlay.type == Enums.playType.pass) boxScore.passing += this.currentPlay.yards;
+				boxScore.totalYards += this.currentPlay.yards;
 				if(endedBy == Enums.playEndedBy.touchdown) {
 					this.currentPlay.playSummary += " for a touchdown!";
 					this.currentPlay.result = Enums.playResult.touchdown;
+					this.currentPlay.type == Enums.playType.run ? boxScore.rushTds++ : boxScore.passTds++;
 				}
 				else if(this.currentDistance - this.currentPlay.yards <= 0) {
 					this.currentDown = 1;
 					this.currentDistance = 10;
 					this.currentPlay.result = Enums.playResult.firstDown;
 					this.currentPlay.playSummary += " for a first down!";
+					boxScore.firstDowns++;
+					this.currentPlay.type == Enums.playType.run ? boxScore.byRushing++ : boxScore.byPassing++;
 				}
 				else {
 					this.currentDistance -= this.currentPlay.yards;
@@ -73,7 +87,7 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 					this.currentPlay.playSummary += " to the " + (this.getNormalizedYardLine());;
 				}
 			}	
-			if(this.currentDown == 4) {
+			if(this.currentDown > 4) {
 				if(this.currentPlay.result == Enums.playResult.none || this.currentPlay.result == Enums.playResult.incomplete) {
 					this.currentPlay.result = Enums.playResult.turnover;
 					this.currentPlay.playSummary += ". Turnover on downs!";
@@ -81,7 +95,7 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 			}
 			this.currentPlay.endTime = this.clock.getCurrentTime();
 			this.plays.push(this.currentPlay);
-			return {playSummary:this.currentPlay.playSummary, playResult: this.currentPlay.result};
+			return {playSummary:this.currentPlay.playSummary, playResult: this.currentPlay.result, boxScore:boxScore};
 		}
 		
 		setCurrentYardLine(yards) {

@@ -6,10 +6,15 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 			this.clock = new Clock();
 			this.score = {playerScore:0, computerScore:0};
 			this.setScore();
+			this.boxScore = {totalYards:0, passing:0, compAtt:{comp:0, atts:0}, passTds:0, interceptions:0, sacks:0, rushing:0, rushAtts:0, rushTds:0, firstDowns:0, byRushing:0, byPassing:0,thirdDowns:{atts:0, convert:0}, fourthDowns:{atts:0, convert:0}};
+			this.setBoxScore();
 		}
 		
 		checkDriveStatus(endedBy) {
-			var result = this.currentDrive.addPlay(endedBy);
+			var result = this.currentDrive.addPlay(endedBy, this.boxScore);
+			this.boxScore = result.boxScore;
+			console.log(this.boxScore);
+			this.setBoxScore();
 			$("#playResult").text(result.playSummary);
 			$("#playByPlayContainer").append('<h6 class="playByPlayItem">' + (this.createLabelFriendlyDownNumber(this.currentDrive.currentPlay.down)) + ' down: ' + result.playSummary + '</h6>');
 			if(result.playResult == Enums.playResult.turnover) {
@@ -58,6 +63,25 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 		setScore() {
 			$("#playerScoreLabels").text(this.score.playerScore);
 			$("#computerScoreLabel").text(this.score.computerScore);
+		}
+
+		setBoxScore() {
+			$("#totalYardsCell").text(this.boxScore.totalYards);
+			$("#passingYardsCell").text(this.boxScore.passing);
+			$("#compAttsCell").text(this.boxScore.compAtt.comp + " / " + this.boxScore.compAtt.atts);
+			$("#yppCell").text(Math.round((this.boxScore.passing / this.boxScore.compAtt.atts) * 10) / 10);
+			$("#passingTdsCell").text(this.boxScore.passTds);
+			$("#interceptionsCell").text(this.boxScore.interceptions);
+			$("#sacksCell").text(this.boxScore.sacks);
+			$("#rushingYardsCell").text(this.boxScore.rushing);
+			$("#rushingAttsCell").text(this.boxScore.rushAtts);
+			$("#yprCell").text(Math.round((this.boxScore.rushing / this.boxScore.compAtt.atts) * 10) / 10);
+			$("#rushingTdsCell").text(this.boxScore.rushTds);
+			$("#firstDownsCell").text(this.boxScore.firstDowns);
+			$("#byRushingCell").text(this.boxScore.byRushing);
+			$("#byPassingCell").text(this.boxScore.byPassing);
+			$("#thirdDownsCell").text(this.boxScore.thirdDowns.atts + " / " + this.boxScore.thirdDowns.convert);
+			$("#fourthDownsCell").text(this.boxScore.fourthDowns.atts + " / " + this.boxScore.fourthDowns.convert);
 		}
 	}
 });

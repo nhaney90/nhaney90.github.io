@@ -3,7 +3,7 @@ define ([],function() {
 		constructor() {
 			this.totalQuarters = 4;
 			this.currentQuarter = 1;
-			this.quarterLength = 180;
+			this.quarterLength = 300;
 			this.timeRemaining = this.quarterLength;
 			this.createTimeLabel();
 		}
