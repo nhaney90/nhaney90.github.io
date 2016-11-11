@@ -51,6 +51,7 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 				this.currentPlay.playSummary = "Player sacked for a loss of " + this.currentPlay.yards + " yards!";
 				this.currentDown++;
 				this.currentPlay.result = Enums.playResult.none;
+				this.currentDistance -= this.currentPlay.yards;
 				boxScore.sacks++;
 			}
 			else if(endedBy == Enums.playEndedBy.incomplete) {
