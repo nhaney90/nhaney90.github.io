@@ -6,6 +6,7 @@ define ([],function() {
 			this.quarterLength = 300;
 			this.timeRemaining = this.quarterLength;
 			this.createTimeLabel();
+			this.gameOver = false;
 		}
 		
 		getCurrentTime() {
@@ -13,7 +14,8 @@ define ([],function() {
 		}
 		
 		decrementTime() {
-			this.timeRemaining--;
+			if(this.timeRemaining - 1 >= 0) this.timeRemaining--;
+			else this.gameOver = true;
 			this.createTimeLabel();
 		}
 		

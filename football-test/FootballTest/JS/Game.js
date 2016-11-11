@@ -20,6 +20,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			this.curentDefender = null;
 			this.gameLoopSeconds = 0;
 			this.validKeys = [13,32,37,38,39,40];
+			this.interval;
 		}
 		
 		addDefenders() {
@@ -127,7 +128,6 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			else if(this.currentKeyCode == 13){
 				this.currentKeyCode = null;
 				if(this.playPaused == true) {
-					console.log("read");
 					this.playPaused = false;
 					this.startPlay();
 				}
@@ -191,8 +191,14 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 		
 		gameLoop() {
 			(function(game){
-				setInterval(function(){
-					game.coreGameLogic();
+				game.interval = setInterval(function(){
+					if(game.stats.clock.gameOver == true && game.ballSnapped == false) {
+						alert("Game Over");
+						clearInterval(game.interval);
+					}
+					else {
+						game.coreGameLogic();
+					}
 				}, 100);
 			}(this));
 		}
