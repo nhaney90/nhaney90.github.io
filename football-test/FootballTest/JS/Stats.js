@@ -23,7 +23,7 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 				this.endDrive();
 				this.createDrive(25);
 			}
-			else if(endedBy == playEndedBy.sack) {
+			else if(endedBy == Enums.playEndedBy.sack) {
 				this.score.computerScore += 2;
 			}
 			else if(result.playResult == Enums.playResult.touchdown) {
