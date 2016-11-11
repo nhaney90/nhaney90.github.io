@@ -13,7 +13,6 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 		checkDriveStatus(endedBy) {
 			var result = this.currentDrive.addPlay(endedBy, this.boxScore);
 			this.boxScore = result.boxScore;
-			console.log(this.boxScore);
 			this.setBoxScore();
 			$("#playResult").text(result.playSummary);
 			$("#playByPlayContainer").append('<h6 class="playByPlayItem">' + (this.createLabelFriendlyDownNumber(this.currentDrive.currentPlay.down)) + ' down: ' + result.playSummary + '</h6>');
@@ -25,6 +24,7 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 			}
 			else if(endedBy == Enums.playEndedBy.sack) {
 				this.score.computerScore += 2;
+				this.setScore();
 			}
 			else if(result.playResult == Enums.playResult.touchdown) {
 				this.score.playerScore += 7;
