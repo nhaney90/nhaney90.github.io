@@ -16,15 +16,15 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 			this.setBoxScore();
 			$("#playResult").text(result.playSummary);
 			$("#playByPlayContainer").append('<h6 class="playByPlayItem">' + (this.createLabelFriendlyDownNumber(this.currentDrive.currentPlay.down)) + ' down: ' + result.playSummary + '</h6>');
+			if(endedBy == Enums.playEndedBy.sack) {
+				this.score.computerScore += 2;
+				this.setScore();
+			}
 			if(result.playResult == Enums.playResult.turnover) {
 				this.score.computerScore += 4;
 				this.setScore();
 				this.endDrive();
 				this.createDrive(25);
-			}
-			else if(endedBy == Enums.playEndedBy.sack) {
-				this.score.computerScore += 2;
-				this.setScore();
 			}
 			else if(result.playResult == Enums.playResult.touchdown) {
 				this.score.playerScore += 7;
