@@ -6,7 +6,7 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 			this.clock = new Clock();
 			this.score = {playerScore:0, computerScore:0};
 			this.setScore();
-			this.boxScore = {totalYards:0, passing:0, compAtt:{comp:0, atts:0}, passTds:0, interceptions:0, sacks:0, rushing:0, rushAtts:0, rushTds:0, firstDowns:0, byRushing:0, byPassing:0,thirdDowns:{atts:0, convert:0}, fourthDowns:{atts:0, convert:0}};
+			this.boxScore = {passing:0, compAtt:{comp:0, atts:0}, passTds:0, interceptions:0, sacks:0, rushing:0, rushAtts:0, rushTds:0, firstDowns:0, byRushing:0, byPassing:0,thirdDowns:{atts:0, convert:0}, fourthDowns:{atts:0, convert:0}};
 			this.setBoxScore();
 		}
 		
@@ -66,7 +66,7 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 		}
 
 		setBoxScore() {
-			$("#totalYardsCell").text(this.boxScore.totalYards);
+			$("#totalYardsCell").text(this.boxScore.passing + this.boxScore.rushing);
 			$("#passingYardsCell").text(this.boxScore.passing);
 			$("#compAttsCell").text(this.boxScore.compAtt.comp + " / " + this.boxScore.compAtt.atts);
 			$("#yppCell").text(Math.round((this.boxScore.passing / this.boxScore.compAtt.atts) * 10) / 10);
@@ -80,8 +80,8 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 			$("#firstDownsCell").text(this.boxScore.firstDowns);
 			$("#byRushingCell").text(this.boxScore.byRushing);
 			$("#byPassingCell").text(this.boxScore.byPassing);
-			$("#thirdDownsCell").text(this.boxScore.thirdDowns.atts + " / " + this.boxScore.thirdDowns.convert);
-			$("#fourthDownsCell").text(this.boxScore.fourthDowns.atts + " / " + this.boxScore.fourthDowns.convert);
+			$("#thirdDownsCell").text(this.boxScore.thirdDowns.convert + " / " + this.boxScore.thirdDowns.atts);
+			$("#fourthDownsCell").text(this.boxScore.fourthDowns.convert + " / " + this.boxScore.fourthDowns.atts);
 		}
 	}
 });

@@ -33,6 +33,8 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 		addPlay(endedBy, boxScore) {
 			this.totalPlays++;
 			this.yards += this.currentPlay.yards;
+			if(this.currentPlay.down == 3) boxScore.thirdDowns.atts++;
+			else if(this.currentPlay.down == 4) boxScore.fourthDowns.atts++;
 			if(this.currentPlay.type) {
 				this.passPlays++;
 				boxScore.compAtt.atts++;
@@ -71,6 +73,8 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 					this.currentPlay.playSummary += " for a touchdown!";
 					this.currentPlay.result = Enums.playResult.touchdown;
 					this.currentPlay.type == Enums.playType.run ? boxScore.rushTds++ : boxScore.passTds++;
+					if(this.currentPlay.down == 3) boxScore.thirdDowns.convert++;
+					else if(this.currentPlay.down == 4) boxScore.fourthDowns.convert++;
 				}
 				else if(this.currentDistance - this.currentPlay.yards <= 0) {
 					this.currentDown = 1;
@@ -79,6 +83,8 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 					this.currentPlay.playSummary += " for a first down!";
 					boxScore.firstDowns++;
 					this.currentPlay.type == Enums.playType.run ? boxScore.byRushing++ : boxScore.byPassing++;
+					if(this.currentPlay.down == 3) boxScore.thirdDowns.convert++;
+					else if(this.currentPlay.down == 4) boxScore.fourthDowns.convert++;
 				}
 				else {
 					this.currentDistance -= this.currentPlay.yards;

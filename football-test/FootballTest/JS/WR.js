@@ -10,7 +10,7 @@ define (["JS/Token.js"],function(Token) {
 			this.lGoRoute = [{x:5,y:2},{x:4,y:2},{x:3,y:2},{x:2,y:2},{x:1,y:2}];
 			this.lCrossingRoute = [{x:5,y:2},{x:4,y:2},{x:3,y:2},{x:3,y:1},{x:3,y:0}];
 			this.lDragRoute = [{x:5,y:2},{x:5,y:1},{x:5,y:0}];
-			this.rCurlRoute = [{x:5,y:0},{x:4,y:0},{x:3,y:0}];
+			this.rCurlRoute = [{x:5,y:0},{x:4,y:0},{x:3,y:0},{x:3,y:1}];
 			this.rGoRoute = [{x:5,y:0},{x:4,y:0},{x:3,y:0},{x:2,y:0},{x:1,y:0}];
 			this.rCrossingRoute = [{x:5,y:0},{x:4,y:0},{x:3,y:0},{x:3,y:1},{x:3,y:2}];
 			this.rDragRoute = [{x:5,y:0},{x:5,y:1},{x:5,y:2}];
