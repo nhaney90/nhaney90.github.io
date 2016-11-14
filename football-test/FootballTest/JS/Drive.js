@@ -36,11 +36,15 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 				this.currentPlay.down++;
 				this.currentPlay.playSummary = "" + ((100 - this.currentYardLine) + 17) + " yard field goal attempt is good!";
 				this.currentPlay.result = Enums.playResult.fieldGoal;
+				this.clock.timeRemaining -= 5;
+				this.clock.createTimeLabel();
 			}
 			else if(endedBy == Enums.playEndedBy.missedFieldGoal) {
 				this.currentPlay.down++;
 				this.currentPlay.playSummary = "" + ((100 - this.currentYardLine) + 17) + " yard field goal attempt is no good!";
 				this.currentPlay.result = Enums.playResult.turnover;
+				this.clock.timeRemaining -= 5;
+				this.clock.createTimeLabel();
 			}
 			else {
 				this.yards += this.currentPlay.yards;
