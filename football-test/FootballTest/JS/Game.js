@@ -145,6 +145,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 				var fieldGoalResult = this.player.kick(this.stats.currentDrive.currentYardLine);
 				if(fieldGoalResult) this.stopPlay(Enums.playEndedBy.madeFieldGoal);
 				else this.stopPlay(Enums.playEndedBy.missedFieldGoal);
+				this.playPaused = false;
 			}
 		}
 		
