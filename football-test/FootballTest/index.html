@@ -103,9 +103,11 @@
 		padding: 5px;
 	}
 	.playByPlayItem {
-		margin-top: -10px;
-		margin-left: 15px;
 		margin-right: 5px;
+		text-indent: 1.5em;
+		padding-top: 5px;
+		padding-bottom: 5px;
+		font-size: 12px;
 	}
 	.blink {
 		animation:blink 400ms infinite alternate;
@@ -116,13 +118,19 @@
 	.boxscoreHeadings {
 		text-indent:1em;
 	}
+	.roundedPanels {
+		-webkit-border-radius: 12px;
+		-moz-border-radius: 7px; 
+		-webkit-box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.4);
+		-moz-box-shadow: 0px 1px 6px rgba(23, 69, 88, .5);		
+	}
 	
 	@keyframes blink {
     from { opacity:1; }
     to { opacity:0; }
 };
 </style>
-<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 	<script src="JS/RequireJS/require.js"></script>
 	<script>
@@ -144,7 +152,7 @@
 <body>
 <div id="uiContainer" class="uiContainer">
 	<div id="leftColumn" class="column">
-		<div id="gameStatsDiv" class="sidePanels">
+		<div id="gameStatsDiv" class="sidePanels roundedPanels">
 			<div class="sidePanelLabel">Game Stats</div>
 			<div id="gameStatsContainer" class="sidePanelContainer">	
 				<table class = "table table-striped">
@@ -221,7 +229,7 @@
 		<button id="showControlsBtn" class="helpBtns btn btn-default" data-target = "#controlsModal" data-toggle = "modal">Controls</button>
 	</div>
 	<div id="centerColumn" class="column">
-		<table id="scoreBoard">
+		<table id="scoreBoard" class="roundedPanels">
 		  <tr>
 			<th>
 				<div class="cellStyling scoreLabels" style="width:180px;">
@@ -273,9 +281,11 @@
 		</div>
 	</div>
 	<div id="rightColumn" class="column">
-		<div id="playByPlayDiv" class="sidePanels">
+		<div id="playByPlayDiv" class="sidePanels roundedPanels">
 			<div class="sidePanelLabel">Play by Play</div>
-			<div id="playByPlayContainer" class="sidePanelContainer"></div>
+			<div id="playByPlayContainer" class="sidePanelContainer">
+				<table id="playByPlayTable" class="table table-striped"></table>
+			</div>
 		</div>
 		<button id="showRulesBtn" class="helpBtns btn btn-default" data-target = "#rulesModal" data-toggle = "modal">How To Play</button>
 	</div>

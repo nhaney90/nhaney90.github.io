@@ -8,8 +8,8 @@ define (["JS/Defender.js"],function(Defender) {
 			this.currentTile = tile 
 			this.addElement(this.currentTile.element, this.elementHTML);
 			this.reactZone=5;
-			this.interval=800;
 			this.moved = false;
+			this.moveInterval = Math.floor(Math.random() * 3) + 2;
 		}
 		
 		enterThrowingLane(game) {

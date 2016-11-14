@@ -15,7 +15,7 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 			this.boxScore = result.boxScore;
 			this.setBoxScore();
 			$("#playResult").text(result.playSummary);
-			$("#playByPlayContainer").append('<h6 class="playByPlayItem">' + (this.createLabelFriendlyDownNumber(this.currentDrive.currentPlay.down)) + ' down: ' + result.playSummary + '</h6>');
+			$("#playByPlayTable").append('<tr><td class="playByPlayItem">' + (this.createLabelFriendlyDownNumber(this.currentDrive.currentPlay.down)) + ' down: ' + result.playSummary + '</td></tr>');
 			if(endedBy == Enums.playEndedBy.sack) {
 				this.score.computerScore += 2;
 				this.setScore();
@@ -38,7 +38,7 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 		}
 		
 		createDrive(start) {
-			$("#playByPlayContainer").append('<h5 class="playByPlayHeading">Drive ' + (this.drives.length + 1) + '</h5>');
+			$("#playByPlayTable").append('<tr><td class="playByPlayHeading">Drive ' + (this.drives.length + 1) + '</td></tr>');
 			this.currentDrive = new Drive(start, this.clock);
 			this.setScoreboardLabels(1, 10, this.currentDrive.getNormalizedYardLine(start));
 		}

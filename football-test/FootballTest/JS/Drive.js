@@ -97,7 +97,7 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 			if(this.currentDown > 4) {
 				if(this.currentPlay.result == Enums.playResult.none || this.currentPlay.result == Enums.playResult.incomplete) {
 					this.currentPlay.result = Enums.playResult.turnover;
-					this.currentPlay.playSummary += ". Turnover on downs!";
+					this.currentPlay.playSummary += "Turnover on downs!";
 				}
 			}
 			this.currentPlay.endTime = this.clock.getCurrentTime();

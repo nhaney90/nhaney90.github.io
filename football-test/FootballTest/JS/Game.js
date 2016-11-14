@@ -109,7 +109,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			if(this.ballSnapped){
 				this.calculateFScores();
 				if(this.currentKeyCode) this.checkCode();
-				if(this.gameLoopSeconds == 3 && this.player.canPass && this.defenders.LB.moved == false) {
+				if(this.gameLoopSeconds == this.defenders.LB.moveInterval && this.player.canPass && this.defenders.LB.moved == false) {
 					var tile = this.defenders.LB.enterThrowingLane(this);
 					this.defenders.LB.move(tile);
 					this.defenders.LB.moved=true;
@@ -323,7 +323,6 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			this.player.canPass = false;
 			this.stats.currentDrive.currentPlay.yards += (this.player.currentTile.x - this.wr.currentTile.x);
 			this.player.move(this.wr.currentTile);
-			console.log(this.stats.currentDrive.currentPlay.yards);
 			if(this.stats.currentDrive.currentPlay.yards + this.stats.currentDrive.currentYardLine >= 100) this.stopPlay(Enums.playEndedBy.touchdown);
 		}
 		
