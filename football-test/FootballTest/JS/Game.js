@@ -19,7 +19,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			this.gameLoop();
 			this.curentDefender = null;
 			this.gameLoopSeconds = 0;
-			this.validKeys = [13,32,37,38,39,40];
+			this.validKeys = [13,32,37,38,39,40,75];
 			this.interval;
 		}
 		
@@ -138,6 +138,13 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 					this.gameLoopCounter = 0;
 					this.gameLoopSeconds = 0;
 				}
+			}
+			else if(this.currentKeyCode == 75 && this.playPaused) {
+				this.currentKeyCode = null;
+				this.stats.currentDrive.startPlay();
+				var fieldGoalResult = this.player.kick(this.stats.currentDrive.currentYardLine);
+				if(fieldGoalResult) this.stopPlay(Enums.playEndedBy.madeFieldGoal);
+				else this.stopPlay(Enums.playEndedBy.missedFieldGoal);
 			}
 		}
 		

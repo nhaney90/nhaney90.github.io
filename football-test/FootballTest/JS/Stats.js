@@ -32,6 +32,12 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 				this.endDrive();
 				this.createDrive(25);
 			}
+			else if(result.playResult == Enums.playResult.fieldGoal) {
+				this.score.playerScore += 3;
+				this.setScore();
+				this.endDrive();
+				this.createDrive(25);
+			}
 			else {
 				this.setScoreboardLabels(this.currentDrive.currentDown, this.currentDrive.currentDistance, this.currentDrive.getNormalizedYardLine(this.currentDrive.currentYardLine));
 			}
