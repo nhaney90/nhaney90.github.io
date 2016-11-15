@@ -1,8 +1,6 @@
 define ([],function() {
 	return class Clock {
 		constructor() {
-			this.totalQuarters = 4;
-			this.currentQuarter = 1;
 			this.quarterLength = 300;
 			this.timeRemaining = this.quarterLength;
 			this.createTimeLabel();
@@ -11,6 +9,12 @@ define ([],function() {
 		
 		getCurrentTime() {
 			return this.currentTime;
+		}
+		
+		runOffClock() {
+			for(var i = 0; i < 5; i++) {
+				if(!this.gameOver) this.decrementTime();
+			}
 		}
 		
 		decrementTime() {

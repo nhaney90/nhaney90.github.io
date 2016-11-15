@@ -110,9 +110,12 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 				this.calculateFScores();
 				if(this.currentKeyCode) this.checkCode();
 				if(this.gameLoopSeconds == this.defenders.LB.moveInterval && this.player.canPass && this.defenders.LB.moved == false) {
-					var tile = this.defenders.LB.enterThrowingLane(this);
-					this.defenders.LB.move(tile);
-					this.defenders.LB.moved=true;
+					this.defenders.LB.enterThrowingLane(this);
+					if(this.defenders.LB.throwingLaneTile != this.wr.currentTile) {
+						this.defenders.LB.move(this.defenders.LB.throwingLaneTile);
+						this.defenders.LB.moved=true;
+					}
+					else this.defenders.LB.moveInterval++;
 				}
 				else if(this.gameLoopCounter == 7) {
 					this.moveDefender();

@@ -1,676 +1,393 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<style>
-		#tileContainer {
-			height: 100%;
-			width: 100%;
-			padding: 0px;
-			margin: 0px;
-		}
-		.tile{
-			height: 60px;
-			width: 60px;
-			background-color: green;
-			color: white;
-		}
-		.player {
-			background-color: black !important;
-		}
-		.wr {
-			background-color: red !important;
-		}
-		.ball {
-			background-color: brown !important;
-			z-index: 100;
-		}
-		.defender {
-			background-color: blue !important;
-		}
-	</style>
-	
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-	<script>
-		$(document).ready(function() {
-		
-			class Token {
-				constructor() {}
-				
-				addElement(position, element) {
-					$("#tile" + position).append(element);
-					this.domElement = $("#" + this.elementId);
-				}
-				
-				removeElement(position, id) {
-					$("#" + this.elementId).remove();
-					this.domElement = null;
-				}
-				
-				setAdjacentTiles(position) {
-					this.adjacentTiles.left = position - 1;
-					this.adjacentTiles.right = position + 1;
-					this.adjacentTiles.top = position -10;
-					this.adjacentTiles.bottom = position + 10;
-					if(this.adjacentTiles.top < 1) this.adjacentTiles.top = null;
-					if(this.adjacentTiles.bottom > 30) this.adjacentTiles.bottom = null;
-				}
-				
-				moveToken(position) {
-					this.removeElement(this.currentTile, this.elementId);
-					this.currentTile = position;
-					this.addElement(this.currentTile, this.elementText);
-					this.setAdjacentTiles(this.currentTile);
-				}
-			}
-			
-			class Ball extends Token {
-				constructor(position, adjacent, player) {
-					super();
-					this.elementId = "ball";
-					this.elementText = "<div id='ball' class='tile ball'>Ball</div>";
-					this.addElement(this.currentTile, this.elementText);
-					this.currentTile = position;
-					this.adjacentTiles = adjacent;
-					this.state = null;
-					this.player = player;
-				}
-				
-				fly() {
-					var a = this;
-					return new Promise(function(resolve, reject) {
-						var i = 0;
-						(function(i, a){
-							var intervalID = setInterval(function() {
-								var success = a.move(a.currentTile - 1);
-								if(success == 2) {
-									clearInterval(intervalID);
-									reject(Error("intercepted"));
-								}
-								else if(success == 1 || success == 3) {
-									clearInterval(intervalID);
-									if(success == 1) resolve({status:"caught",ball:a});
-									else resolve({status:"incomplete",ball:a});
-								}
-							}, 300);
-						}(i, a));
-					});
-				}
-				
-				move(position) {
-					var success;
-					if($("#tile" + position).children().length == 0) success = 0;
-					else success = this.checkToken(position);
-					this.removeElement(this.currentTile, this.elementId);
-					this.currentTile = position;
-					if(this.checkPosition(position)) {
-						this.addElement(this.currentTile, this.elementText);
-						this.setAdjacentTiles(this.currentTile);
-					}
-					else success = 3;
-					return success;
-				}
-				
-				checkPosition(position) {
-					var check = this.currentTile / 10;
-					if(check == 0 || check == 1 || check == 2) return false;
-					else return true;
-				}
-				
-				checkToken(position) {
-					var id = $("#tile" + position).children()[0].id;
-					if(id == "wr") return 1;
-					else if(id == "RDE" || id == "LDE" || id == "DT") return 0;
-					else return 2;
-				}
-			}
-			
-			class Reciever extends Token {
-				constructor() {
-					super();
-					this.elementId = "wr";
-					this.elementText = "<div id='wr' class='tile wr'>WR</div>";
-					this.currentTile = 28;
-					this.addElement(this.currentTile, this.elementText);
-					this.setInitialTiles();
-					this.curlRoute = [27,26,25];
-					this.goRoute = [27,26,25,24,23,22,21];
-					this.postRoute = [27,26,25,14,3];
-					this.dragRoute = [27,26,25,24,14,4];
-					this.routes=[this.curlRoute, this.goRoute, this.postRoute, this.dragRoute];
-					this.halt = false;
-				}
-				
-				setInitialTiles() {
-					this.adjacentTiles = {left:27,right:29,bottom:null,top:18};
-				}
-				
-				move(position) {
-					if($("#tile" + position).children().length != 0) {
-						var id = $("#tile" + position).children()[0].id;
-						if(id == "RDE" || id == "LDE" || id == "DT") {
-							this.moveToken(position);
-							return true;
-						}
-					}
-					else {
-						this.moveToken(position);
-						return true;
-					}
-				}
-				
-				runRoute(routes) {
-					var i = 0;
-					var a = this;
-					(function(i, a, routes){
-						var intervalID = setInterval(function() {
-							if(routes[i] && a.halt == false) {
-								var success = a.move(routes[i]);
-								if(success) i++;
-							}
-							else {
-								clearInterval(intervalID);
-							}
-						}, 800);
-					}(i, a, routes));
-				}
-				
-				selectRoute() {
-					var randomNumber = Math.floor((Math.random() * 4));
-					this.runRoute(this.routes[randomNumber]);
-				}
-			}
-			
-			class Player extends Token {
-				constructor() {
-					super();
-					this.elementId = "player";
-					this.elementText = "<div id='player' class='tile player'>QB</div>";
-					this.currentTile = 20;
-					this.addElement(this.currentTile, this.elementText);
-					this.setInitialTiles();
-					this.ball = null;
-					this.wr = new Reciever();
-					this.canPass = true;
-					this.ballSnapped = false;
-				}
-				
-				setInitialTiles() {
-					this.adjacentTiles = {left:19,right:null,bottom:30,top:10};
-				}
-				
-				removeReceiver() {
-					this.wr.removeElement();
-					this.wr.halt = true;
-				}
-				
-				move(position) {
-					if($("#tile" + position).children().length != 0) {
-						var id = $("#tile" + position).children()[0].id;
-						if(id == "wr") {
-							this.moveToken(position);
-						}
-						else {
-							alert("tackled!");
-						}
-					}
-					else {
-						this.moveToken(position);
-					}
-					if(position == 27 || position == 17 || position == 7) this.canPass = false;
-				}
-				
-				checkKeyCode(code) {
-					var newTile
-					switch(code) {
-						case 13: {
-							this.ballSnapped = true;
-							this.wr.selectRoute();
-							rde.runDefense(rde.dFour);
-							lde.runDefense(lde.dFour);
-							dt.runDefense(dt.dFour);
-							lb.runDefense(lb.dFour);
-							fs.runDefense(fs.dFour);
-							cb.runDefense(cb.dFour);
-							break;
-						}
-						case 32: {
-							if(this.ballSnapped) {
-								if(this.canPass)this.pass();
-							}
-							break;
-						}
-						case 37: {
-							if(this.ballSnapped) {
-								var check = (this.currentTile + 9) / 10;
-								if(check == 1){ newTile = 10; this.removeReceiver();}
-								else if(check == 2){ newTile = 20; this.removeReceiver();}
-								else if(check == 3){newTile = 30; this.removeReceiver();}
-								else newTile = this.adjacentTiles.left;
-							}
-							break;
-						}
-						case 38: {
-							if(this.ballSnapped) {
-								newTile = this.adjacentTiles.top;
-							}
-							break;
-						}
-						case 39: {
-							if(this.ballSnapped) {
-								if(this.currentTile % 10 == 0) newTile = null;
-								else newTile = this.adjacentTiles.right;
-							}
-							break;
-						}
-						case 40: {
-							if(this.ballSnapped) {
-								newTile = this.adjacentTiles.bottom;
-							}
-							break;
-						}
-					}
-					if(newTile) {
-						this.move(newTile);
-					}
-				}
-				
-				pass() {
-					if(this.ball == null) {
-						this.ball = new Ball(this.currentTile, {left:this.adjacentTiles.left, right:this.adjacentTiles.right, bottom:this.adjacentTiles.bottom, top:this.adjacentTiles.top}, this);
-						this.ball.fly().then(this.checkStatus, this.turnOver);
-					}
-				}
-				
-				checkStatus(response) {
-					if(response.status == "caught") {
-						response.ball.player.removeReceiver();
-						response.ball.player.wr.removeElement();
-						response.ball.removeElement();
-						response.ball.player.move(response.ball.currentTile);
-					}
-				}
-				
-				turnOver(error) {console.log(error)}
-			}class Player extends Token {
-				constructor() {
-					super();
-					this.elementId = "player";
-					this.elementText = "<div id='player' class='tile player'>QB</div>";
-					this.currentTile = 20;
-					this.addElement(this.currentTile, this.elementText);
-					this.setInitialTiles();
-					this.ball = null;
-					this.wr = new Reciever();
-					this.canPass = true;
-					this.ballSnapped = false;
-				}
-				
-				setInitialTiles() {
-					this.adjacentTiles = {left:19,right:null,bottom:30,top:10};
-				}
-				
-				removeReceiver() {
-					this.wr.removeElement();
-					this.wr.halt = true;
-				}
-				
-				move(position) {
-					if($("#tile" + position).children().length != 0) {
-						var id = $("#tile" + position).children()[0].id;
-						if(id == "wr") {
-							this.moveToken(position);
-						}
-						else {
-							alert("tackled!");
-						}
-					}
-					else {
-						this.moveToken(position);
-					}
-					if(position == 27 || position == 17 || position == 7) this.canPass = false;
-				}
-				
-				checkKeyCode(code) {
-					var newTile
-					switch(code) {
-						case 13: {
-							this.ballSnapped = true;
-							this.wr.selectRoute();
-							rde.runDefense(rde.dFour);
-							lde.runDefense(lde.dFour);
-							dt.runDefense(dt.dFour);
-							lb.runDefense(lb.dFour);
-							fs.runDefense(fs.dFour);
-							cb.runDefense(cb.dFour);
-							break;
-						}
-						case 32: {
-							if(this.ballSnapped) {
-								if(this.canPass)this.pass();
-							}
-							break;
-						}
-						case 37: {
-							if(this.ballSnapped) {
-								var check = (this.currentTile + 9) / 10;
-								if(check == 1){ newTile = 10; this.removeReceiver();}
-								else if(check == 2){ newTile = 20; this.removeReceiver();}
-								else if(check == 3){newTile = 30; this.removeReceiver();}
-								else newTile = this.adjacentTiles.left;
-							}
-							break;
-						}
-						case 38: {
-							if(this.ballSnapped) {
-								newTile = this.adjacentTiles.top;
-							}
-							break;
-						}
-						case 39: {
-							if(this.ballSnapped) {
-								if(this.currentTile % 10 == 0) newTile = null;
-								else newTile = this.adjacentTiles.right;
-							}
-							break;
-						}
-						case 40: {
-							if(this.ballSnapped) {
-								newTile = this.adjacentTiles.bottom;
-							}
-							break;
-						}
-					}
-					if(newTile) {
-						this.move(newTile);
-					}
-				}
-				
-				pass() {
-					if(this.ball == null) {
-						this.ball = new Ball(this.currentTile, {left:this.adjacentTiles.left, right:this.adjacentTiles.right, bottom:this.adjacentTiles.bottom, top:this.adjacentTiles.top}, this);
-						this.ball.fly().then(this.checkStatus, this.turnOver);
-					}
-				}
-				
-				checkStatus(response) {
-					if(response.status == "caught") {
-						response.ball.player.removeReceiver();
-						response.ball.player.wr.removeElement();
-						response.ball.removeElement();
-						response.ball.player.move(response.ball.currentTile);
-					}
-				}
-				
-				turnOver(error) {console.log(error)}
-			}
-			
-			class Defender extends Token {
-				constructor() {super();}
-				
-				runDefense(path) {
-					var i = 0;
-					var a = this;
-					(function(i, a, path){
-						var intervalID = setInterval(function() {
-							if(path[i]) {
-								var success = a.move(path[i]);
-								i++;
-							}
-							else {
-								clearInterval(intervalID);
-							}
-						}, 1000);
-					}(i, a, path));
-				}
-				
-				move(position) {
-					if($("#tile" + position).children().length != 0) {
-						var id = $("#tile" + position).children()[0].id;
-						if(id == "player") {
-							alert("tackled!");
-						}
-					}
-					else {
-						this.moveToken(position);
-						return true;
-					}
-				}
-			}
-			
-			class RDE extends Defender {
-				constructor() {
-					super();
-					this.elementId = "RDE";
-					this.elementText = "<div id='RDE' class='tile defender'>RDE</div>";
-					this.currentTile = 27;
-					this.addElement(this.currentTile, this.elementText);
-					this.setInitialTiles();
-					this.dOne = [28,29];
-					this.dTwo = [28,29];
-					this.dThree = [28,29];
-					this.dFour = [28,29];
-					this.dFive = [28,29];
-				}
-				
-				setInitialTiles() {
-					this.adjacentTiles = {left:26,right:28,bottom:null,top:17};
-				}
-			}
-			
-			class LDE extends Defender {
-				constructor() {
-					super();
-					this.elementId = "LDE";
-					this.elementText = "<div id='LDE' class='tile defender'>LDE</div>";
-					this.currentTile = 7;
-					this.addElement(this.currentTile, this.elementText);
-					this.setInitialTiles();
-					this.dOne = [8,9];
-					this.dTwo = [8,9];
-					this.dThree = [8,9];
-					this.dFour = [8,9];
-					this.dFive = [17,18];
-				}
-				
-				setInitialTiles() {
-					this.adjacentTiles = {left:6,right:8,bottom:17,top:null};
-				}
-			}
-			
-			class DT extends Defender {
-				constructor() {
-					super();
-					this.elementId = "DT";
-					this.elementText = "<div id='DT' class='tile defender'>DT</div>";
-					this.currentTile = 17;
-					this.addElement(this.currentTile, this.elementText);
-					this.setInitialTiles();
-					this.dOne = [];
-					this.dTwo = [7];
-					this.dThree = [18,19];
-					this.dFour = [27];
-					this.dFive = [27];
-				}
-				
-				setInitialTiles() {
-					this.adjacentTiles = {left:17,right:18,bottom:27,top:7};
-				}
-			}
-			
-			class LB extends Defender {
-				constructor() {
-					super();
-					this.elementId = "LB";
-					this.elementText = "<div id='LB' class='tile defender'>LB</div>";
-					this.currentTile = 15;
-					this.addElement(this.currentTile, this.elementText);
-					this.setInitialTiles();
-					this.dOne = [];
-					this.dTwo = [16,17];
-					this.dThree = [25];
-					this.dFour = [14];
-					this.dFive = [14];
-				}
-				
-				setInitialTiles() {
-					this.adjacentTiles = {left:14,right:16,bottom:15,top:5};
-				}
-			}
-			
-			class FS extends Defender {
-				constructor() {
-					super();
-					this.elementId = "FS";
-					this.elementText = "<div id='FS' class='tile defender'>FS</div>";
-					this.currentTile = 21;
-					this.addElement(this.currentTile, this.elementText);
-					this.setInitialTiles();
-					this.dOne = [];
-					this.dTwo = [];
-					this.dThree = [];
-					this.dFour = [11,1];
-					this.dFive = [];
-				}
-				
-				setInitialTiles() {
-					this.adjacentTiles = {left:null,right:22,bottom:null,top:11};
-				}
-			}
-			
-			class CB extends Defender {
-				constructor() {
-					super();
-					this.elementId = "CB";
-					this.elementText = "<div id='CB' class='tile defender'>CB</div>";
-					this.currentTile = 3;
-					this.addElement(this.currentTile, this.elementText);
-					this.setInitialTiles();
-					this.dOne = [13];
-					this.dTwo = [];
-					this.dThree = [4];
-					this.dFour = [13,23];
-					this.dFive = [];
-				}
-				
-				setInitialTiles() {
-					this.adjacentTiles = {left:2,right:4,bottom:13,top:null};
-				}
-			}
+<link rel="stylesheet" href="JS/ExternalLibs/bootstrap/css/bootstrap.min.css">
+<style>
+	#scoreBoard {
+		font-family: arial, sans-serif;
+		border-collapse: collapse;
+		width: 620px;
+		color: white;
+		background-color: black;
+		margin:10px;
+		font-weight: bold;
+	}
 
-			var player = new Player();
-			var rde = new RDE();
-			var lde = new LDE();
-			var dt = new DT();
-			var lb = new LB();
-			var fs = new FS();
-			var cb = new CB();
-			
-			window.onkeydown = function(evt) {
-				player.checkKeyCode(evt.keyCode)
+	.cellStyling {
+		text-align: center !important;
+	}
+
+	.scoreValues {
+		font-size: 30px;
+		letter-spacing: 1.5px;
+		margin-top: -15px;
+	}
+	.scoreLabels {
+	}
+	.sidePanels {
+		width: 300px;
+		background-color: blue;
+		height: 400px;
+		margin-top: 60px;
+	}
+	.uiContainer {
+		display:flex;
+		margin:20px;
+	}
+	.sidePanelLabel {
+		margin: 10px;
+		font-size: 25px;
+		font-weight: bolder;
+		text-align: center;
+		color: white;
+	}
+	.sidePanelContainer {
+		background-color: white;
+		width: 300;
+		width: 260px;
+		margin: 20px;
+		height: 300px;
+		overflow: hidden;
+		overflow-y: scroll;
+	}
+	.column {
+		display:flex;
+		flex-direction:column;
+	}
+	.helpBtns{
+		margin: 10px;
+		font-size: 20px;
+	}
+	.headingStyle {
+		font-weight: bolder;
+	}
+
+	#tileContainer {
+		height: 100%;
+		width: 100%;
+		padding: 0px;
+		margin: 0px;
+	}
+	.tile{
+		height: 67px;
+		width: 67px;
+		background-color: green;
+		color: white;
+		position: relative;
+		border: 1px solid #dddddd;
+	}
+	.token {
+		height: 100%;
+		width: 100%;
+		color: white;
+		top: 0px;
+		left: 0px;
+		position: absolute;
+	}
+	.player {
+		background-color: black;
+	}
+	.wr {
+		background-color: red;
+	}
+	.ball {
+		background-color: brown;
+		z-index: 100;
+	}
+	.defender {
+		background-color: blue;
+		z-index: 100;
+	}
+	.playByPlayHeading {
+		font-weight: bold;
+		padding: 5px;
+	}
+	.playByPlayItem {
+		margin-right: 5px;
+		text-indent: 1.5em;
+		padding-top: 5px;
+		padding-bottom: 5px;
+		font-size: 12px;
+	}
+	.blink {
+		animation:blink 400ms infinite alternate;
+	}
+	.boxscoreBoldHeadings {
+		font-weight:bolder;
+	}
+	.boxscoreHeadings {
+		text-indent:1em;
+	}
+	.roundedPanels {
+		-webkit-border-radius: 12px;
+		-moz-border-radius: 7px; 
+		-webkit-box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.4);
+		-moz-box-shadow: 0px 1px 6px rgba(23, 69, 88, .5);		
+	}
+	
+	@keyframes blink {
+    from { opacity:1; }
+    to { opacity:0; }
+};
+</style>
+<script src="JS/ExternalLibs/jquery-3.1.1.min.js"></script>
+<script src="JS/ExternalLibs/bootstrap/js/bootstrap.min.js"></script>
+	<script src="JS/ExternalLibs/require.js"></script>
+	<script>
+		requirejs.config({
+			paths: {
+				'jquery': 'JS/ExternalLibs/jquery-3.1.1.min',
 			}
+		});
+
+		require(["JS/Game"],function(Game){
+			var game = new Game();
+			game.createField("fieldContainer");
+			game.createFieldTiles();
+			game.setFieldTokens();
+			game.readUserInput();
 		});
 	</script>
 </head>
 <body>
-	<div id="tileContainer">
-		<table>
-			<tr>
-				<th>
-					<div class="tile" id="tile1"></div>
-				</th>
-				<th>
-					<div class="tile" id="tile2"></div>
-				</th>
-				<th>
-					<div class="tile" id="tile3"></div>
-				</th>
-				<th>
-					<div class="tile" id="tile4"></div>
-				</th>
-				<th>
-					<div class="tile" id="tile5"></div>
-				</th>
-				<th>
-					<div class="tile" id="tile6"></div>
-				</th>
-				<th>
-					<div class="tile" id="tile7"></div>
-				</th>
-				<th>
-					<div class="tile" id="tile8"></div>
-				</th>
-				<th>
-					<div class="tile" id="tile9"></div>
-				</th>
-				<th>
-					<div class="tile" id="tile10"></div>
-				</th>
-			</tr>
-			 <tr>
-				<th>
-					<div class="tile" id="tile11"></div>
-				</th>
-				<th>
-					<div class="tile" id="tile12"></div>
-				</th>
-				<th>
-					<div class="tile" id="tile13"></div>
-				</th>
-				<th>
-					<div class="tile" id="tile14"></div>
-				</th>
-				<th>
-					<div class="tile" id="tile15"></div>
-				</th>
-				<th>
-					<div class="tile" id="tile16"></div>
-				</th>
-				<th>
-					<div class="tile" id="tile17"></div>
-				</th>
-				<th>
-					<div class="tile" id="tile18"></div>
-				</th>
-				<th>
-					<div class="tile" id="tile19"></div>
-				</th>
-				<th>
-					<div class="tile" id="tile20"></div>
-				</th>
-			 </tr>
-			 <tr>
-				<th>
-					<div class="tile" id="tile21"></div>
-				</th>
-				<th>
-					<div class="tile" id="tile22"></div>
-				</th>
-				<th>
-					<div class="tile" id="tile23"></div>
-				</th>
-				<th>
-					<div class="tile" id="tile24"></div>
-				</th>
-				<th>
-					<div class="tile" id="tile25"></div>
-				</th>
-				<th>
-					<div class="tile" id="tile26"></div>
-				</th>
-				<th>
-					<div class="tile" id="tile27"></div>
-				</th>
-				<th>
-					<div class="tile" id="tile28"></div>
-				</th>
-				<th>
-					<div class="tile" id="tile29"></div>
-				</th>
-				<th>
-					<div class="tile" id="tile30"></div>
-				</th>			 
-			 </tr>
-		 </table>
+<div id="uiContainer" class="uiContainer">
+	<div id="leftColumn" class="column">
+		<div id="gameStatsDiv" class="sidePanels roundedPanels">
+			<div class="sidePanelLabel">Game Stats</div>
+			<div id="gameStatsContainer" class="sidePanelContainer">	
+				<table class = "table table-striped">
+					<tbody>
+						<tr class="boxscoreBoldHeadings">
+							<td>Total Yards</td>
+							<td id="totalYardsCell"></td>
+						</tr>
+						<tr class="boxscoreBoldHeadings">
+							<td>Passing</td>
+							<td id="passingYardsCell"></td>
+						</tr>
+						<tr>
+							<td class="boxscoreHeadings" >Comp Atts</td>
+							<td id="compAttsCell" ></td>
+						</tr>
+						<tr>
+							<td class="boxscoreHeadings">Yards Per Pass</td>
+							<td id="yppCell" ></td>
+						</tr>
+						<tr>
+							<td class="boxscoreHeadings">Touchdowns</td>
+							<td id="passingTdsCell"></td>
+						</tr>
+						<tr>
+							<td class="boxscoreHeadings">Interceptions</td>
+							<td id="interceptionsCell"></td>
+						</tr>
+						<tr>
+							<td class="boxscoreHeadings">Sacks</td>
+							<td id="sacksCell"></td>
+						</tr>
+						<tr class="boxscoreBoldHeadings">
+							<td>Rushing</td>
+							<td id="rushingYardsCell"></td>
+						</tr>
+						<tr>
+							<td class="boxscoreHeadings">Rushing Atts</td>
+							<td id="rushingAttsCell"></td>
+						</tr>
+						<tr>
+							<td class="boxscoreHeadings">Yards Per Rush</td>
+							<td id="yprCell"></td>
+						</tr>
+						<tr>
+							<td class="boxscoreHeadings">Touchdowns</td>
+							<td id="rushingTdsCell"></td>
+						</tr>
+						<tr class="boxscoreBoldHeadings">
+							<td>1st Downs</td>
+							<td id="firstDownsCell"></td>
+						</tr>
+						<tr>
+							<td class="boxscoreHeadings">By Rushing</td>
+							<td id="byRushingCell"></td>
+						</tr>
+						<tr>
+							<td class="boxscoreHeadings">By Passing</td>
+							<td id="byPassingCell"></td>
+						</tr>
+						<tr class="boxscoreBoldHeadings">
+							<td>3rd Downs</td>
+							<td id="thirdDownsCell"></td>
+						</tr>
+						<tr class="boxscoreBoldHeadings">
+							<td>4th Downs</td>
+							<td id="fourthDownsCell"></td>
+						</tr>
+				   </tbody>
+				   
+				</table>
+			</div>
+		</div>
+		<button id="showControlsBtn" class="helpBtns btn btn-default" data-target = "#controlsModal" data-toggle = "modal">Controls</button>
 	</div>
+	<div id="centerColumn" class="column">
+		<table id="scoreBoard" class="roundedPanels">
+		  <tr>
+			<th>
+				<div class="cellStyling scoreLabels" style="width:180px;">
+					<p style="font-size: 22px;letter-spacing: 2px;">Player</p>
+					<div id="playerScoreLabels" class="scoreValues"></div>
+				</div>
+			</th>
+			<th>
+				<div class="cellStyling" style="width:260px;">
+					<div id="timeLabel" style="font-size:45px; font-weight:bolder; letter-spacing:4px;"></div>
+				</div>	
+			</th>
+			<th>
+				<div class="cellStyling scoreLabels" style="width:180px;">
+					<p style="font-size: 20px;letter-spacing: 2px;">Computer</p>
+					<div id="computerScoreLabel" class="scoreValues"></div>
+				</div>	
+			</th>
+		  </tr>
+		  <tr>
+			<td>
+				<div class="cellStyling scoreLabels">
+					<p>Down</p>
+					<div id="downLabel" class="scoreValues"></div>
+				</div>
+			</td>
+			<td>
+				<div class="cellStyling scoreLabels">
+					<p>To Go</p>
+					<div id="distanceLabel" class="scoreValues"></div>
+				</div>	
+			</td>
+			<td>
+				<div class="cellStyling scoreLabels">
+					<p>Ball On</p>
+					<div id="yardLineLabel" class="scoreValues"></div>
+				</div>	
+			</td>
+		  </tr>
+		</table>
+		<div id="fieldContainer" style="margin:10px"></div>
+		<div id="currentPlayDiv" style="display:flex; font-size:25px; font-weight:bolder; margin-top:20px; margin-left:10px;">
+			<div>Current Play:&nbsp</div>
+			<div id="currentPlay"></div>
+		</div>
+		<div id="playResultDiv" style="display:flex; font-size:25px; font-weight:bolder; margin-top:20px; margin-left:10px;">
+			<div>Play Result:&nbsp</div>
+			<div id="playResult"></div>
+		</div>
+	</div>
+	<div id="rightColumn" class="column">
+		<div id="playByPlayDiv" class="sidePanels roundedPanels">
+			<div class="sidePanelLabel">Play by Play</div>
+			<div id="playByPlayContainer" class="sidePanelContainer">
+				<table id="playByPlayTable" class="table table-striped"></table>
+			</div>
+		</div>
+		<button id="showRulesBtn" class="helpBtns btn btn-default" data-target = "#rulesModal" data-toggle = "modal">How To Play</button>
+	</div>
+	<div class = "modal fade" id = "controlsModal" tabindex = "-1" role = "dialog" aria-labelledby = "myModalLabel" aria-hidden = "true">
+	   <div class = "modal-dialog">
+		  <div class = "modal-content">
+			 <div class = "modal-header">
+				<button type = "button" class = "close" data-dismiss = "modal" aria-hidden = "true">
+					  &times;
+				</button>
+				<h4 class = "modal-title" id = "myModalLabel">
+				   Pro Football 2.0 Controls
+				</h4>
+			 </div>
+			 <div class = "modal-body">
+				<table style="width:100%">
+					<tr>
+						<td>Up Arrow</td>
+						<td>Move Forward</td> 
+					</tr>
+					<tr>
+						<td>Down Arrow</td>
+						<td>Move Backwards</td> 
+					</tr>
+					<tr>
+						<td>Left Arrow</td>
+						<td>Move Forward</td> 
+					</tr>
+					<tr>
+						<td>Down Arrow</td>
+						<td>Move Backwards</td> 
+					</tr>
+					<tr>
+						<td>Enter</td>
+						<td>Snap the Ball</td> 
+					</tr>
+					<tr>
+						<td>Space</td>
+						<td>Pass Ball</td> 
+					</tr>
+					<tr>
+						<td>K</td>
+						<td>Kick a Field Goal</td> 
+					</tr>
+				</table>				
+			 </div>
+			 <div class = "modal-footer">
+				<h5 style="left:10px; position:absolute;">Click on the map to enable keyboard input</h5>
+				<button type = "button" class = "btn btn-default" data-dismiss = "modal">
+				   Close
+				</button>
+			 </div>
+		  </div>
+	   </div>
+	</div>
+	<div class = "modal fade" id = "rulesModal" tabindex = "-1" role = "dialog" aria-labelledby = "myModalLabel" aria-hidden = "true">
+	   <div class = "modal-dialog">
+		  <div class = "modal-content">
+			 <div class = "modal-header">
+				<button type = "button" class = "close" data-dismiss = "modal" aria-hidden = "true">
+					  &times;
+				</button>
+				<h4 class = "modal-title" id = "myModalLabel">How to Play Pro Football 2.0</h4>
+			 </div>
+			 <div class = "modal-body">
+				<div class="panel panel-default">
+					<div class="panel-heading headingStyle">Goal of the Game</div>
+					<div class="panel-body">
+						<p>Text</p>
+					</div>
+					<div class="panel-heading headingStyle">Role of the Player</div>
+					<div class="panel-body">
+						<p>Text</p>
+					</div>
+					<div class="panel-heading headingStyle">The Wide Receiver</div>
+					<div class="panel-body">
+						<p>Text</p>
+					</div>
+					<div class="panel-heading headingStyle">The Defenders</div>
+					<div class="panel-body">
+						<p>Text</p>
+					</div>
+					<div class="panel-heading headingStyle">The Gameclock</div>
+					<div class="panel-body">
+						<p>Text</p>
+					</div>
+					<div class="panel-heading headingStyle">Scoring System</div>
+					<div class="panel-body">
+						<p>Text</p>
+					</div>
+				</div>
+			 </div>
+			 <div class = "modal-footer">
+				<h5 style="left:10px; position:absolute;">Click on the map to enable keyboard input</h5>
+				<button type = "button" class = "btn btn-default" data-dismiss = "modal">
+				   Close
+				</button>
+			 </div>
+		  </div>
+	   </div>
+	</div>
+</div>
+
 </body>
 </html>
