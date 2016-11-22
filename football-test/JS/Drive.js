@@ -51,11 +51,13 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 				if(this.currentPlay.down == 3) boxScore.thirdDowns.atts++;
 				else if(this.currentPlay.down == 4) boxScore.fourthDowns.atts++;
 				if(this.currentPlay.type) {
+					if(boxScore.longestPass < this.currentPlay.yards) boxScore.longestPass = this.currentPlay.yards;
 					this.passPlays++;
 					boxScore.compAtt.atts++;
 					boxScore.compAtt.comp++;
 				}
 				else {
+					if(boxScore.longestRun < this.currentPlay.yards) boxScore.longestRun = this.currentPlay.yards;
 					this.currentPlay.type = Enums.playType.run;
 					this.runPlays++;
 					boxScore.rushAtts++;

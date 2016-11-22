@@ -6,6 +6,13 @@ define ([],function() {
 			this.messages = [];
 		}
 		
+		displayMessages() {
+			for(var i = 0; i < this.messages.length; i++) {
+				$("#newRecordModalDiv").append('<p style="font-size:large">' + this.messages[i] + '<p><br/>');
+			}
+			$("#recordScoreModal").modal('show');
+		}
+		
 		initializeDatabase() {
 			var db = this;
 			return new Promise(function(resolve, reject) {
@@ -66,7 +73,9 @@ define ([],function() {
 						if(currentGameHighScores[record] > this.highScores[record].score) this.setNewHighScore(currentGameHighScores[record], this.highScores[record], record, currentPlayer);
 					}
 				}
-			}		
+			}
+			console.log(this.messages.length);
+			if(this.messages.length > 0) console.log("message");this.displayMessages();
 		}
 		
 		setNewHighScore(newRecord, oldRecord, record, currentPlayer) {
@@ -156,7 +165,19 @@ define ([],function() {
 
 			$("#r19score").text(this.highScores.fourthDowns.score);
 			$("#r19player").text(this.highScores.fourthDowns.player);
-			$("#r19date").text(this.highScores.fourthDowns.date);			
+			$("#r19date").text(this.highScores.fourthDowns.date);
+
+			$("#r20score").text(this.highScores.rushAttempts.score);
+			$("#r20player").text(this.highScores.rushAttempts.player);
+			$("#r20date").text(this.highScores.rushAttempts.date);	
+
+			$("#r21score").text(this.highScores.passAttempts.score);
+			$("#r21player").text(this.highScores.passAttempts.player);
+			$("#r21date").text(this.highScores.passAttempts.date);
+
+			$("#r22score").text(this.highScores.completions.score);
+			$("#r22player").text(this.highScores.completions.player);
+			$("#r22date").text(this.highScores.completions.date);				
 		}
 	}
 });

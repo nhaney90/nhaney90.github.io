@@ -440,6 +440,24 @@
 							<td id="r10date"></td>
 						</tr>
 						<tr>
+							<td id="r20name">Most Rushing Attempts</td>
+							<td id="r20score"></td>
+							<td id="r20player"></td>
+							<td id="r20date"></td>
+						</tr>
+						<tr>
+							<td id="r21name">Most Passing Attempts</td>
+							<td id="r21score"></td>
+							<td id="r21player"></td>
+							<td id="r21date"></td>
+						</tr>
+						<tr>
+							<td id="r22name">Most Completions</td>
+							<td id="r22score"></td>
+							<td id="r22player"></td>
+							<td id="r22date"></td>
+						</tr>
+						<tr>
 							<td id="r11name">Highest Completion Percentage</td>
 							<td id="r11score"></td>
 							<td id="r11player"></td>
@@ -578,6 +596,32 @@
 				<div class="modal-footer">
 					<button type="button" id="beginGameBtn" data-dismiss="modal" class="btn btn-primary">
 						Kickoff!
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="recordScoreModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" 
+					   data-dismiss="modal">
+						   <span aria-hidden="true">&times;</span>
+						   <span class="sr-only">Close</span>
+					</button>
+					<h4 class="modal-title" id="myModalLabel">
+						New High Score!
+					</h4>
+				</div>
+				
+				<div class="modal-body">
+					<div id="newRecordModalDiv"></div>
+				</div>
+				
+				<div class="modal-footer">
+					<button type="button" data-dismiss="modal" class="btn btn-primary">
+						Close
 					</button>
 				</div>
 			</div>

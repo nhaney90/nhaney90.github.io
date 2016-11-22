@@ -221,7 +221,8 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 					if(game.stats.clock.gameOver == true && game.ballSnapped == false) {
 						alert("Game Over");
 						clearInterval(game.interval);
-						this.database.checkHighScores(this.stats.highScores, "nickipedia");
+						game.stats.finalizeStats();
+						game.database.checkHighScores(game.stats.highScores, game.stats.playerName);
 					}
 					else {
 						game.coreGameLogic();

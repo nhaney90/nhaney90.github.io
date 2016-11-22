@@ -6,9 +6,9 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 			this.clock = new Clock();
 			this.score = {playerScore:0, computerScore:0};
 			this.setScore();
-			this.boxScore = {passing:0, compAtt:{comp:0, atts:0}, passTds:0, interceptions:0, sacks:0, rushing:0, rushAtts:0, rushTds:0, firstDowns:0, byRushing:0, byPassing:0,thirdDowns:{atts:0, convert:0}, fourthDowns:{atts:0, convert:0}};
+			this.boxScore = {passing:0, compAtt:{comp:0, atts:0}, passTds:0, interceptions:0, sacks:0, rushing:0, rushAtts:0, rushTds:0, firstDowns:0, byRushing:0, byPassing:0,thirdDowns:{atts:0, convert:0}, fourthDowns:{atts:0, convert:0}, longestRun:0, longestPass:0};
 			this.highScores = {completionPercentage: 0, completions: 0, firstDowns: 0, fourthDowns: 0, fieldGoals: 0, interceptions: 0,
-				longestFieldGoal: 0, longestKickReturn: 0, longestPass: 0, longestRun: 0, margin: 0, passingTDs: 0, passingYards:0, points: 0, pointsAllowed: 0, rushingTDs: 0, rushingYards: 0, sacks: 0, yards: 0, yardsPerPass: 0, yardsPerRush: 0}
+				longestFieldGoal: 0, longestKickReturn: 0, longestPass: 0, longestRun: 0, margin: 0, passAttempts:0, passingTDs: 0, passingYards:0, points: 0, pointsAllowed: 0, rushingTDs: 0, rushingYards: 0, rushAttempts:0, sacks: 0, yards: 0, yardsPerPass: 0, yardsPerRush: 0}
 			this.setBoxScore();
 			this.playerName = playerName;
 			$("#playerNameScoreboardLabel").text(this.playerName);
@@ -77,37 +77,46 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 			$("#playerScoreLabels").text(this.score.playerScore);
 			$("#computerScoreLabel").text(this.score.computerScore);
 		}
+		
+		finalizeStats() {
+			this.highScores.yards = this.boxScore.passing + this.boxScore.rushing;
+			this.highScores.passingYards = this.boxScore.passing;
+			this.highScores.completionPercentage = (Math.round((this.boxScore.compAtt.comp / this.boxScore.compAtt.atts) * 10) / 10) * 100;
+			this.highScores.yardsPerPass = Math.round((this.boxScore.passing / this.boxScore.compAtt.atts) * 10) / 10;
+			this.highScores.passingTDs = this.boxScore.passTds;
+			this.highScores.interceptions = this.boxScore.interceptions;
+			this.highScores.sacks = this.boxScore.sacks;
+			this.highScores.rushingYards = this.boxScore.rushing;
+			this.highScores.rushAttempts = this.boxScore.rushAtts;
+			this.highScores.yardsPerRush = Math.round((this.boxScore.rushing / this.boxScore.rushAtts) * 10) / 10;
+			this.highScores.firstDowns = this.boxScore.firstDowns;
+			this.highScores.fourthDowns = this.boxScore.fourthDowns.convert;
+			this.highScores.longestRun = this.boxScore.longestRun;
+			this.highScores.longestPass = this.boxScore.longestPass;
+			this.highScores.passAttempts = this.boxScore.compAtt.atts;
+			this.highScores.completions = this.boxScore.compAtt.comp;
+			this.highScores.pointsAllowed =  $("#computerScoreLabel").text();
+			this.highScores.points = $("#playerScoreLabels").text();
+			this.highScores.margin = this.highScores.points - this.highScores.pointsAllowed;
+		}
 
 		setBoxScore() {
-			this.highScores.yards = this.boxScore.passing + this.boxScore.rushing;
-			$("#totalYardsCell").text(this.highScores.yards);
-			this.highScores.passingYards = this.boxScore.passing;
-			$("#passingYardsCell").text(this.highScores.passingYards);
-			this.highScores.completionPercentage = this.boxScore.compAtt.comp + " / " + this.boxScore.compAtt.atts;
-			$("#compAttsCell").text(this.highScores.completionPercentage);
-			this.highScores.yardsPerPass = Math.round((this.boxScore.passing / this.boxScore.compAtt.atts) * 10) / 10;
-			$("#yppCell").text(this.highScores.yardsPerPass);
-			this.highScores.passingTDs = this.boxScore.passTds;
-			$("#passingTdsCell").text(this.highScores.passingTDs);
-			this.highScores.interceptions = this.boxScore.interceptions;
-			$("#interceptionsCell").text(this.highScores.interceptions);
-			this.highScores.sacks = this.boxScore.sacks;
-			$("#sacksCell").text(this.highScores.sacks);
-			this.highScores.rushingYards;
-			$("#rushingYardsCell").text(this.highScores.rushingYards);
-			this.highScores.rushAttempts = this.boxScore.rushAtts;
-			$("#rushingAttsCell").text(this.highScores.rushAttempts);
-			this.highScores.yardsPerRush = Math.round((this.boxScore.rushing / this.boxScore.rushAtts) * 10) / 10;
-			$("#yprCell").text(this.highScores.yardsPerRush);
-			this.highScores.rushingTDs = this.boxScore.rushTds
-			$("#rushingTdsCell").text(this.highScores.rushingTDs);
-			this.highScores.firstDowns = this.boxScore.firstDowns;
-			$("#firstDownsCell").text(this.highScores.firstDowns);
+			$("#totalYardsCell").text(this.boxScore.passing + this.boxScore.rushing);
+			$("#passingYardsCell").text(this.boxScore.passing);
+			$("#compAttsCell").text(this.boxScore.compAtt.comp + " / " + this.boxScore.compAtt.atts);
+			$("#yppCell").text(Math.round((this.boxScore.passing / this.boxScore.compAtt.atts) * 10) / 10);
+			$("#passingTdsCell").text(this.boxScore.passTds);
+			$("#interceptionsCell").text(this.boxScore.interceptions);
+			$("#sacksCell").text(this.boxScore.sacks);
+			$("#rushingYardsCell").text(this.boxScore.rushing);
+			$("#rushingAttsCell").text(this.boxScore.rushAtts);
+			$("#yprCell").text(Math.round((this.boxScore.rushing / this.boxScore.rushAtts) * 10) / 10);
+			$("#rushingTdsCell").text(this.boxScore.rushTds);
+			$("#firstDownsCell").text(this.boxScore.firstDowns);
 			$("#byRushingCell").text(this.boxScore.byRushing);
 			$("#byPassingCell").text(this.boxScore.byPassing);
 			$("#thirdDownsCell").text(this.boxScore.thirdDowns.convert + " / " + this.boxScore.thirdDowns.atts);
-			this.highScores.fourthDowns = this.boxScore.fourthDowns.convert;
-			$("#fourthDownsCell").text(this.boxScore.fourthDowns.convert + " / " + this.boxScore.fourthDowns.atts);
+			$("#fourthDownsCell").text(this.boxScore.fourthDowns.convert);
 		}
 	}
 });
