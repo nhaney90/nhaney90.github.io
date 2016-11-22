@@ -96,8 +96,8 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 			this.highScores.longestRun = this.boxScore.longestRun;
 			this.highScores.longestPass = this.boxScore.longestPass;
 			this.highScores.completions = this.boxScore.compAtt.comp;
-			this.highScores.pointsAllowed =  parseInt($("#computerScoreLabel").text());
-			this.highScores.points = parseInt($("#playerScoreLabels").text());
+			this.highScores.pointsAllowed =  this.score.computerScore;
+			this.highScores.points = this.score.playerScore;
 			this.highScores.margin = this.highScores.points - this.highScores.pointsAllowed;
 			this.highScores.fieldGoals = this.boxScore.fieldGoals;
 			this.highScores.longestFieldGoal = this.boxScore.longestFieldGoal;

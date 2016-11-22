@@ -39,8 +39,8 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 				this.currentPlay.result = Enums.playResult.fieldGoal;
 				this.clock.runOffClock();
 				this.clock.createTimeLabel();
-				if(this.boxScore.longestFieldGoal < fieldGoalLength) this.boxScore.longestFieldGoal = fieldGoalLength;
-				this.boxScore.fieldGoals++;
+				if(boxScore.longestFieldGoal < fieldGoalLength) boxScore.longestFieldGoal = fieldGoalLength;
+				boxScore.fieldGoals++;
 			}
 			else if(endedBy == Enums.playEndedBy.missedFieldGoal) {
 				this.currentPlay.down++;
