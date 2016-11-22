@@ -70,7 +70,7 @@ define ([],function() {
 		}
 		
 		setNewHighScore(newRecord, oldRecord, record, currentPlayer) {
-			var dt = new Date();
+			var date = new Date();
 			var message = currentPlayer + " has set a new record for " + oldRecord.message + " at " + newRecord + ". This replaces the old record of " + oldRecord.score + " set by " + oldRecord.player + ".";
 			this.messages.push(message);
 			this.database.ref("allTimeRecords/" + record).set({
