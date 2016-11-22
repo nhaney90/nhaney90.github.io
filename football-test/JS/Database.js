@@ -66,6 +66,9 @@ define ([],function() {
 		checkHighScores(currentGameHighScores, currentPlayer) {
 			for(var record in currentGameHighScores) {
 				if(currentGameHighScores.hasOwnProperty(record)) {
+					console.log(record);
+					console.log(currentGameHighScores[record]);
+					console.log(this.highScores[record].score);
 					if(record == "interceptions" || record == "sacks" || record == "pointsAllowed") {
 						if(currentGameHighScores[record] < this.highScores[record].score) this.setNewHighScore(currentGameHighScores[record], this.highScores[record], record, currentPlayer);
 					}
@@ -74,8 +77,7 @@ define ([],function() {
 					}
 				}
 			}
-			console.log(this.messages.length);
-			if(this.messages.length > 0) console.log("message");this.displayMessages();
+			if(this.messages.length > 0) this.displayMessages();
 		}
 		
 		setNewHighScore(newRecord, oldRecord, record, currentPlayer) {
