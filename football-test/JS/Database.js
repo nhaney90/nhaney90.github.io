@@ -77,7 +77,7 @@ define ([],function() {
 				player: currentPlayer,
 				score: newRecord,
 				message: oldRecord.message,
-				date: date.getUTCMonth() + 1) + "/" + date.getUTCDate() + "/" + date.getUTCFullYear();
+				date: (date.getUTCMonth() + 1) + "/" + date.getUTCDate() + "/" + date.getUTCFullYear()
 			});
 		}
 		
