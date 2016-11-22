@@ -1,6 +1,6 @@
 define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],function(Drive, Play, Clock, Enums) {
 	return class Stats {
-		constructor() {
+		constructor(playerName) {
 			this.drives = [];
 			this.currentDrive = null;
 			this.clock = new Clock();
@@ -10,11 +10,12 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 			this.highScores = {completionPercentage: 0, completions: 0, firstDowns: 0, fourthDowns: 0, fieldGoals: 0, interceptions: 0,
 				longestFieldGoal: 0, longestKickReturn: 0, longestPass: 0, longestRun: 0, margin: 0, passingTDs: 0, passingYards:0, points: 0, pointsAllowed: 0, rushingTDs: 0, rushingYards: 0, sacks: 0, yards: 0, yardsPerPass: 0, yardsPerRush: 0}
 			this.setBoxScore();
-			this.game;
+			this.playerName = playerName;
+			$("#playerNameScoreboardLabel").text(this.playerName);
 		}
 		
 		checkDriveStatus(endedBy) {
-			var result = this.currentDrive.addPlay(endedBy, this.boxScore);
+			var result = this.currentDrive.addPlay(endedBy, this.boxScore, this.playerName);
 			this.boxScore = result.boxScore;
 			this.setBoxScore();
 			$("#playResult").text(result.playSummary);
@@ -80,7 +81,7 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 		setBoxScore() {
 			this.highScores.yards = this.boxScore.passing + this.boxScore.rushing;
 			$("#totalYardsCell").text(this.highScores.yards);
-			this.highScores.passingYards = this.boxScore.pass;
+			this.highScores.passingYards = this.boxScore.passing;
 			$("#passingYardsCell").text(this.highScores.passingYards);
 			this.highScores.completionPercentage = this.boxScore.compAtt.comp + " / " + this.boxScore.compAtt.atts;
 			$("#compAttsCell").text(this.highScores.completionPercentage);

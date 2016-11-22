@@ -1,4 +1,4 @@
-define (["jquery"],function($) {
+define ([],function() {
 	return class Tile {
 		constructor(rowid,tileid,x,y) {
 			this.fScore = null;

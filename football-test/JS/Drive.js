@@ -30,7 +30,7 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 			this.addPlay();
 		}
 		
-		addPlay(endedBy, boxScore) {
+		addPlay(endedBy, boxScore, playerName) {
 			this.totalPlays++;
 			if(endedBy == Enums.playEndedBy.madeFieldGoal) {
 				this.currentPlay.down++;
@@ -63,7 +63,7 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 				}
 				this.setCurrentYardLine(this.currentPlay.yards);
 				if(endedBy == Enums.playEndedBy.sack) {
-					this.currentPlay.playSummary = "Player sacked for a loss of " + this.currentPlay.yards + " yards!";
+					this.currentPlay.playSummary = playerName + " sacked for a loss of " + this.currentPlay.yards + " yards!";
 					this.currentDown++;
 					this.currentPlay.result = Enums.playResult.none;
 					this.currentDistance -= this.currentPlay.yards;
@@ -76,13 +76,13 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 					boxScore.compAtt.comp--;
 				}
 				else if(endedBy == Enums.playEndedBy.interception) {
-					this.currentPlay.playSummary = "Player pass intercepted!";
+					this.currentPlay.playSummary = playerName + " pass intercepted!";
 					this.currentPlay.result = Enums.playResult.turnover
 					boxScore.compAtt.comp--;
 					boxScore.interceptions++;
 				}
 				else {
-					this.currentPlay.playSummary = "Player " + (this.currentPlay.type == 0 ? "runs" : "passes") + " for " +  this.currentPlay.yards + " yards";
+					this.currentPlay.playSummary = playerName + " " + (this.currentPlay.type == 0 ? "runs" : "passes") + " for " +  this.currentPlay.yards + " yards";
 					if(this.currentPlay.type == Enums.playType.pass) boxScore.passing += this.currentPlay.yards;
 					boxScore.totalYards += this.currentPlay.yards;
 					if(endedBy == Enums.playEndedBy.touchdown) {

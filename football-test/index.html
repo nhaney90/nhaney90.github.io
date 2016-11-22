@@ -68,7 +68,7 @@
 		padding: 0px;
 		margin: 0px;
 	}
-	#showHighScoreBtn{
+	#showHighScoreBtn, #restartGameBtn{
 		position: absolute;
 		width: 280px;
 	}
@@ -136,33 +136,37 @@
 </style>
 <script src="https://www.gstatic.com/firebasejs/3.6.1/firebase.js"></script>
 <script src="JS/ExternalLibs/jquery-3.1.1.min.js"></script>
+<script src="JS/ExternalLibs/require.js"></script>
 <script src="JS/ExternalLibs/bootstrap/js/bootstrap.min.js"></script>
-	<script src="JS/ExternalLibs/require.js"></script>
 	<script>
-		requirejs.config({
-			paths: {
-				'jquery': 'JS/ExternalLibs/jquery-3.1.1.min',
-			}
-		});
 
 		require(["JS/Game"],function(Game){
-			var game = new Game();
-			game.createField("fieldContainer");
-			game.createFieldTiles();
-			game.setFieldTokens();
-			//game.kickoffs.kickoffBall();
-			game.readUserInput();
-			game.database.initializeDatabase().then(function(response) {
-				game.database.getHighScores().then(function(scores) {
-					console.log(scores);
-				});
+			$("#playerNameModal").modal('show');
+			$("#restartGameBtn").click(function() {location.reload();});
+			$("#beginGameBtn").click(function(){
+				createGame($("#playerNameInput").val());
 			});
+			
+			function createGame(playerName) {
+				var game = new Game(playerName);
+				game.createField("fieldContainer");
+				game.createFieldTiles();
+				game.setFieldTokens();
+				//game.kickoffs.kickoffBall();
+				game.readUserInput();
+				game.database.initializeDatabase().then(function(response) {
+					game.database.getHighScores().then(function(scores) {
+						console.log(scores);
+					});
+				});
+			}
 		});
 	</script>
 </head>
 <body>
 <div id="uiContainer" class="uiContainer">
 	<div id="leftColumn" class="column">
+		<button id="restartGameBtn" class="helpBtns btn btn-default">Restart Game</button>
 		<div id="gameStatsDiv" class="sidePanels roundedPanels">
 			<div class="sidePanelLabel">Game Stats</div>
 			<div id="gameStatsContainer" class="sidePanelContainer">	
@@ -244,7 +248,7 @@
 		  <tr>
 			<th>
 				<div class="cellStyling scoreLabels" style="width:180px;">
-					<p style="font-size: 22px;letter-spacing: 2px;">Player</p>
+					<p id="playerNameScoreboardLabel" style="font-size: 22px;letter-spacing: 2px;"></p>
 					<div id="playerScoreLabels" class="scoreValues"></div>
 				</div>
 			</th>
@@ -508,7 +512,7 @@
 				<button type = "button" class = "close" data-dismiss = "modal" aria-hidden = "true">
 					  &times;
 				</button>
-				<h4 class = "modal-title" id = "myModalLabel">Alltime Records</h4>
+				<h4 class = "modal-title" id = "myModalLabel">How to Play Pro Football 2.0</h4>
 			 </div>
 			 <div class = "modal-body">
 				<div class="panel panel-default">
@@ -546,6 +550,38 @@
 			 </div>
 		  </div>
 	   </div>
+	</div>
+	<div class="modal fade" id="playerNameModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" 
+					   data-dismiss="modal">
+						   <span aria-hidden="true">&times;</span>
+						   <span class="sr-only">Close</span>
+					</button>
+					<h4 class="modal-title" id="myModalLabel">
+						Welcome to Pro Football 2.0!
+					</h4>
+				</div>
+				
+				<div class="modal-body">
+					<form role="form">
+					  <div class="form-group">
+						<label for="playerNameInput">Enter Player Name</label>
+						  <input type="text" class="form-control"
+							  id="playerNameInput" placeholder="Player Name"/>
+					  </div>
+					</form>
+				</div>
+				
+				<div class="modal-footer">
+					<button type="button" id="beginGameBtn" data-dismiss="modal" class="btn btn-primary">
+						Kickoff!
+					</button>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 

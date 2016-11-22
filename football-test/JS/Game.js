@@ -1,6 +1,6 @@
 define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.js","JS/CB.js","JS/FS.js","JS/WR.js","JS/Utils/Enums.js","JS/Stats.js", "JS/Kickoffs.js", "JS/Database.js"], function(Tile, Player, LB, DT, RDE, LDE, CB, FS, WR, Enums, Stats, Kickoffs, Database) {
 	return class Game {
-		constructor() {
+		constructor(playerName) {
 			this.database = new Database();
 			this.tiles = [];
 			this.fieldElementId = "field";
@@ -11,7 +11,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			this.defenders = {RDE:null,LDE:null,DT:null,LB:null,CB:null,FS:null}
 			this.player = null;
 			this.ballInAir = false;
-			this.stats = new Stats();
+			this.stats = new Stats(playerName);
 			this.stats.createDrive(25);
 			this.playPaused = true;
 			this.gameLoopCounter = 0;
