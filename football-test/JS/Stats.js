@@ -81,8 +81,9 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 		finalizeStats() {
 			this.highScores.yards = this.boxScore.passing + this.boxScore.rushing;
 			this.highScores.passingYards = this.boxScore.passing;
+			this.highScores.passAttempts = this.boxScore.compAtt.atts;
 			this.highScores.completionPercentage = (Math.round((this.boxScore.compAtt.comp / this.boxScore.compAtt.atts) * 10) / 10) * 100;
-			this.highScores.yardsPerPass = this.highScores.rushAttempts > 7 ? Math.round((this.boxScore.passing / this.boxScore.compAtt.atts) * 10) / 10 : 0;
+			this.highScores.yardsPerPass = this.highScores.passAttempts > 7 ? Math.round((this.boxScore.passing / this.boxScore.compAtt.atts) * 10) / 10 : 0;
 			this.highScores.passingTDs = this.boxScore.passTds;
 			this.highScores.rushingTDs = this.boxScore.rushTds;
 			this.highScores.interceptions = this.boxScore.interceptions;
@@ -94,7 +95,6 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 			this.highScores.fourthDowns = this.boxScore.fourthDowns.convert;
 			this.highScores.longestRun = this.boxScore.longestRun;
 			this.highScores.longestPass = this.boxScore.longestPass;
-			this.highScores.passAttempts = this.boxScore.compAtt.atts;
 			this.highScores.completions = this.boxScore.compAtt.comp;
 			this.highScores.pointsAllowed =  parseInt($("#computerScoreLabel").text());
 			this.highScores.points = parseInt($("#playerScoreLabels").text());
