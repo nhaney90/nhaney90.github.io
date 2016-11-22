@@ -45,5 +45,36 @@ define (["JS/Token.js"],function(Token) {
 				}(ball));
 			});
 		}
+		
+		kickOff(remove) {
+			var ball = this;
+			return new Promise(function(resolve, reject) {
+				(function(ball){
+					var intervalID = setInterval(function() {
+						if(ball.currentTile.x + 1 > 9) {
+							clearInterval(intervalID);
+							if(remove) ball.removeElement(ball.element);
+							resolve("complete");
+						}
+						else ball.move(ball.game.tiles[ball.currentTile.y][ball.currentTile.x + 1]);
+					}, 200);
+				}(ball));
+			});
+		}
+		
+		fieldGoal() {
+			var ball = this;
+			return new Promise(function(resolve, reject) {
+				(function(ball){
+					var intervalID = setInterval(function() {
+						if(ball.currentTile.x - 1 < 0) {
+							clearInterval(intervalID);
+							ball.removeElement(ball.element);
+							resolve("complete");
+						}
+					}, 200);
+				}(ball));
+			});
+		}
 	}
 });

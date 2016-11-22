@@ -68,6 +68,10 @@
 		padding: 0px;
 		margin: 0px;
 	}
+	#showHighScoreBtn{
+		position: absolute;
+		width: 280px;
+	}
 	.tile{
 		height: 67px;
 		width: 67px;
@@ -130,6 +134,7 @@
     to { opacity:0; }
 };
 </style>
+<script src="https://www.gstatic.com/firebasejs/3.6.1/firebase.js"></script>
 <script src="JS/ExternalLibs/jquery-3.1.1.min.js"></script>
 <script src="JS/ExternalLibs/bootstrap/js/bootstrap.min.js"></script>
 	<script src="JS/ExternalLibs/require.js"></script>
@@ -145,7 +150,13 @@
 			game.createField("fieldContainer");
 			game.createFieldTiles();
 			game.setFieldTokens();
+			//game.kickoffs.kickoffBall();
 			game.readUserInput();
+			game.database.initializeDatabase().then(function(response) {
+				game.database.getHighScores().then(function(scores) {
+					console.log(scores);
+				});
+			});
 		});
 	</script>
 </head>
@@ -281,10 +292,13 @@
 		</div>
 	</div>
 	<div id="rightColumn" class="column">
+		<button id="showHighScoreBtn" class="helpBtns btn btn-default" data-target = "#highScoresModal" data-toggle = "modal">High Scores</button>
 		<div id="playByPlayDiv" class="sidePanels roundedPanels">
 			<div class="sidePanelLabel">Play by Play</div>
 			<div id="playByPlayContainer" class="sidePanelContainer">
-				<table id="playByPlayTable" class="table table-striped"></table>
+				<table id="playByPlayTable" class="table table-striped">
+					<tbody></tbody>
+				</table>
 			</div>
 		</div>
 		<button id="showRulesBtn" class="helpBtns btn btn-default" data-target = "#rulesModal" data-toggle = "modal">How To Play</button>
@@ -341,14 +355,160 @@
 		  </div>
 	   </div>
 	</div>
-	<div class = "modal fade" id = "rulesModal" tabindex = "-1" role = "dialog" aria-labelledby = "myModalLabel" aria-hidden = "true">
+	<div class = "modal fade" id = "highScoresModal" tabindex = "-1" role = "dialog" aria-labelledby = "myModalLabel" aria-hidden = "true">
 	   <div class = "modal-dialog">
 		  <div class = "modal-content">
 			 <div class = "modal-header">
 				<button type = "button" class = "close" data-dismiss = "modal" aria-hidden = "true">
 					  &times;
 				</button>
-				<h4 class = "modal-title" id = "myModalLabel">How to Play Pro Football 2.0</h4>
+				<h4 class = "modal-title" id = "myModalLabel">All Time Records</h4>
+			 </div>
+			 <div class = "modal-body">
+				<table style="width:100%">
+					<thead>
+						<tr style="font-weight:bolder;">
+							<td>Record</td>
+							<td>Score</td>
+							<td>Player</td>
+							<td>Date</td> 
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td id="r1name">Most Points Scored</td>
+							<td id="r1score"></td>
+							<td id="r1player"></td>
+							<td id="r1date"></td>
+						</tr>
+						<tr>
+							<td id="r2name">Fewest Points Allowed</td>
+							<td id="r2score"></td>
+							<td id="r2player"></td>
+							<td id="r2date"></td>
+						</tr>
+						<tr>
+							<td id="r3name">Largest Margin of Victory</td>
+							<td id="r3score"></td>
+							<td id="r3player"></td>
+							<td id="r3date"></td>
+						</tr>
+						<tr>
+							<td id="r4name">Most Rushing TDs</td>
+							<td id="r4score"></td>
+							<td id="r4player"></td>
+							<td id="r4date"></td>
+						</tr>
+						<tr>
+							<td id="r5name">Most Passing TDs</td>
+							<td id="r5score"></td>
+							<td id="r5player"></td>
+							<td id="r5date"></td>
+						</tr>
+						<tr>
+							<td id="r6name">Most Total Yards Gained</td>
+							<td id="r6score"></td>
+							<td id="r6player"></td>
+							<td id="r6date"></td> 
+						</tr>
+						<tr>
+							<td id="r7name">Most Rushing Yards Gained</td>
+							<td id="r7score"></td>
+							<td id="r7player"></td>
+							<td id="r7date"></td>
+						</tr>
+						<tr>
+							<td id="r8name">Most Passing Yards Gained</td>
+							<td id="r8score"></td>
+							<td id="r8player"></td>
+							<td id="r8date"></td>
+						</tr>
+						<tr>
+							<td id="r9name">Highest Yards Per Rush</td>
+							<td id="r9score"></td>
+							<td id="r9player"></td>
+							<td id="r9date"></td>
+						</tr>
+						<tr>
+							<td id="r10name">Highest Yards Per Pass</td>
+							<td id="r10score"></td>
+							<td id="r10player"></td>
+							<td id="r10date"></td>
+						</tr>
+						<tr>
+							<td id="r11name">Highest Completion Percentage</td>
+							<td id="r11score"></td>
+							<td id="r11player"></td>
+							<td id="r11date"></td>
+						</tr>
+						<tr>
+							<td id="r12name">Longest Run</td>
+							<td id="r12score"></td>
+							<td id="r12player"></td>
+							<td id="r12date"></td>
+						</tr>
+						<tr>
+							<td id="r13name">Longest Pass</td>
+							<td id="r13score"></td>
+							<td id="r13player"></td>
+							<td id="r13date"></td> 
+						</tr>
+						<tr>
+							<td id="r14name">Fewest Interceptions Thrown</td>
+							<td id="r14score"></td>
+							<td id="r14player"></td>
+							<td id="r14date"></td>
+						</tr>
+						<tr>
+							<td id="r15name">Fewest Sacks Allowed</td>
+							<td id="r15score"></td>
+							<td id="r15player"></td>
+							<td id="r15date"></td>
+						</tr>
+						<tr>
+							<td id="r16name">Most Field Goals</td>
+							<td id="r16score"></td>
+							<td id="r16player"></td>
+							<td id="r16date"></td>
+						</tr>
+						<tr>
+							<td id="r17name">Longest Field Goal</td>
+							<td id="r17score"></td>
+							<td id="r17player"></td>
+							<td id="r17date"></td>
+						</tr>
+						<tr>
+							<td id="r18name">Most First Downs</td>
+							<td id="r18score"></td>
+							<td id="r18player"></td>
+							<td id="r18date"></td>
+						</tr>
+						<tr>
+							<td id="r19name">Most Fourth Downs Converted</td>
+							<td id="r19score"></td>
+							<td id="r19player"></td>
+							<td id="r19date"></td>
+						</tr>
+					</tbody>
+				</table>
+			 </div>
+			 <div class = "modal-footer">
+				<h5 style="left:10px; position:absolute;">Click on the map to enable keyboard input</h5>
+				<button type = "button" class = "btn btn-default" data-dismiss = "modal">
+				   Close
+				</button>
+			 </div>
+		  </div>
+	   </div>
+	</div>
+		<div class = "modal fade" id = "rulesModal" tabindex = "-1" role = "dialog" aria-labelledby = "myModalLabel" aria-hidden = "true">
+	   <div class = "modal-dialog">
+		  <div class = "modal-content">
+			 <div class = "modal-header">
+				<button type = "button" class = "close" data-dismiss = "modal" aria-hidden = "true">
+					  &times;
+				</button>
+				<h4 class = "modal-title" id = "myModalLabel">Alltime Records</h4>
 			 </div>
 			 <div class = "modal-body">
 				<div class="panel panel-default">

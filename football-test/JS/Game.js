@@ -1,6 +1,7 @@
-define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.js","JS/CB.js","JS/FS.js","JS/WR.js","JS/Utils/Enums.js","JS/Stats.js"], function(Tile, Player, LB, DT, RDE, LDE, CB, FS, WR, Enums, Stats) {
+define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.js","JS/CB.js","JS/FS.js","JS/WR.js","JS/Utils/Enums.js","JS/Stats.js", "JS/Kickoffs.js", "JS/Database.js"], function(Tile, Player, LB, DT, RDE, LDE, CB, FS, WR, Enums, Stats, Kickoffs, Database) {
 	return class Game {
 		constructor() {
+			this.database = new Database();
 			this.tiles = [];
 			this.fieldElementId = "field";
 			this.fieldElement = $("<table id='field'><tr id='row1'></tr><tr id='row2'><tr id='row3'></table>");
@@ -21,6 +22,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			this.gameLoopSeconds = 0;
 			this.validKeys = [13,32,37,38,39,40,75];
 			this.interval;
+			this.kickoffs = new Kickoffs(this);
 		}
 		
 		addDefenders() {
@@ -56,7 +58,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 		checkOccupiedTiles(id, type) {
 			var defenderOccupiedTileIds = [];
 			for(var defender in this.defenders) {
-				if(this.defenders.hasOwnProperty(defender)) {
+				if(this.defenders.hasOwnProperty(defender) && this.defenders[defender] != null) {
 					defenderOccupiedTileIds.push(this.defenders[defender].currentTile.id);
 				}
 			}
@@ -109,22 +111,35 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			if(this.ballSnapped){
 				this.calculateFScores();
 				if(this.currentKeyCode) this.checkCode();
-				if(this.gameLoopSeconds == this.defenders.LB.moveInterval && this.player.canPass && this.defenders.LB.moved == false) {
-					this.defenders.LB.enterThrowingLane(this);
-					if(this.defenders.LB.throwingLaneTile != this.wr.currentTile) {
-						this.defenders.LB.move(this.defenders.LB.throwingLaneTile);
-						this.defenders.LB.moved=true;
+				if(this.kickoffs.kickReturn == false) {
+					if(this.player.canPass && this.gameLoopSeconds == this.defenders.LB.moveInterval && this.defenders.LB.moved == false) {
+						this.defenders.LB.enterThrowingLane(this);
+						if(this.defenders.LB.throwingLaneTile != this.wr.currentTile) {
+							this.defenders.LB.move(this.defenders.LB.throwingLaneTile);
+							this.defenders.LB.moved=true;
+						}
+						else this.defenders.LB.moveInterval++;
 					}
-					else this.defenders.LB.moveInterval++;
+					else if(this.gameLoopCounter == 7) {
+						this.moveDefender();
+					}
+					else if(this.gameLoopCounter == 9) {
+						if(!this.wr.halt) this.runRoute();
+					}
 				}
-				else if(this.gameLoopCounter == 7) {
-					this.moveDefender();
+				else {
+					if(this.gameLoopCounter == 7) {
+						console.log(this.gameLoopSeconds);
+						if(this.gameLoopSeconds < 6) {
+							this.kickoffs.addRandomDefender(this.gameLoopSeconds);
+						}
+						this.moveDefender();
+					}
 				}
-				else if(this.gameLoopCounter == 9) {
-					if(!this.wr.halt) this.runRoute();
-					this.stats.clock.decrementTime();
+				if(this.gameLoopCounter == 9){
 					this.gameLoopCounter = 0;
 					this.gameLoopSeconds++;
+					this.stats.clock.decrementTime();
 				}
 				this.gameLoopCounter++;
 			}
@@ -206,6 +221,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 					if(game.stats.clock.gameOver == true && game.ballSnapped == false) {
 						alert("Game Over");
 						clearInterval(game.interval);
+						this.database.checkHighScores(this.stats.highScores, "nickipedia");
 					}
 					else {
 						game.coreGameLogic();
@@ -219,6 +235,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			while(success == false) {
 				var smallest = null;
 				this.currentDefender = this.defenders[this.selectRandomDefender()];
+				console.log(this.currentDefender);
 				if(this.currentDefender.currentTile.x + 1 < 10) {
 					smallest = this.findSmallestFScore(smallest, this.tiles[this.currentDefender.currentTile.y][this.currentDefender.currentTile.x+1]);
 				}
@@ -231,6 +248,8 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 				if(this.currentDefender.currentTile.y - 1 > -1) {
 					smallest = this.findSmallestFScore(smallest, this.tiles[this.currentDefender.currentTile.y - 1][this.currentDefender.currentTile.x]);
 				}
+				console.log(smallest.fScore);
+				console.log(this.currentDefender.reactZone);
 				if(smallest.fScore <= this.currentDefender.reactZone) {
 					success = true;
 				}
@@ -239,29 +258,32 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 		}
 		
 		movePlayer(direction) {
-			if(direction == Enums.playerMovement.left) {
-				if(this.player.currentTile.x == 0) {
-					this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][9].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y][9], direction);
+			if(this.ballInAir == false) {
+				if(direction == Enums.playerMovement.left) {
+					if(this.player.currentTile.x == 0) {
+						this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][9].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y][9], direction);
+					}
+					else {
+						this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][this.player.currentTile.x - 1].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y][this.player.currentTile.x - 1], direction);
+					}
 				}
-				else {
-					this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][this.player.currentTile.x - 1].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y][this.player.currentTile.x - 1], direction);
+				else if(direction == Enums.playerMovement.up) {
+					if((this.player.currentTile.y - 1) > -1 && this.ballSnapped) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y - 1][this.player.currentTile.x].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y - 1][this.player.currentTile.x], direction);
 				}
-			}
-			else if(direction == Enums.playerMovement.up) {
-				if((this.player.currentTile.y - 1) > -1 && this.ballSnapped) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y - 1][this.player.currentTile.x].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y - 1][this.player.currentTile.x], direction);
-			}
-			else if(direction == Enums.playerMovement.right) {
-				if(this.player.currentTile.x + 1 < 10 && this.ballSnapped) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][this.player.currentTile.x + 1].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y][this.player.currentTile.x + 1],direction);
-				else if(this.player.currentTile.x + 1 > 9 && this.ballSnapped && this.player.canPass == false) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][0].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y][0],direction);
-			}
-			else if(direction == Enums.playerMovement.down) {
-				if((this.player.currentTile.y + 1) < 3 && this.ballSnapped) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y + 1][this.player.currentTile.x].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y + 1][this.player.currentTile.x],direction);
+				else if(direction == Enums.playerMovement.right) {
+					if(this.player.currentTile.x + 1 < 10 && this.ballSnapped) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][this.player.currentTile.x + 1].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y][this.player.currentTile.x + 1],direction);
+					else if(this.player.currentTile.x + 1 > 9 && this.ballSnapped && this.player.canPass == false) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][0].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y][0],direction);
+				}
+				else if(direction == Enums.playerMovement.down) {
+					if((this.player.currentTile.y + 1) < 3 && this.ballSnapped) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y + 1][this.player.currentTile.x].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y + 1][this.player.currentTile.x],direction);
+				}
 			}
 		}
 		
 		readUserInput() {
 			(function(game){
 				$(window).on("keydown", function(evt) {
+					$(".helpBtns.btn.btn-default").blur();
 					if(game.validKeys.indexOf(evt.keyCode) > -1) game.currentKeyCode = evt.keyCode;
 				});
 			}(this));
@@ -300,6 +322,14 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 				else if(random == 2 || random == 3) return "LDE";
 				else return "DT";
 			}
+			else if(this.kickoffs.kickReturn == true) {
+				var randomDefender = null;
+				while(randomDefender == null) {
+					var randomNumber = Math.floor(Math.random() * 6)
+					randomDefender = Object.keys(this.defenders)[randomNumber];
+				}
+				return randomDefender;
+			}
 			else {
 				var random = Math.floor(Math.random() * 12)
 				if(random < 3) return "LB";
@@ -326,7 +356,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 		
 		stopPlay(endedBy) {
 			this.ballSnapped = false;
-			this.wr.halt = true;
+			if(this.wr) this.wr.halt = true;
 			this.stats.checkDriveStatus(endedBy);
 		}
 		
