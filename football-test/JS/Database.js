@@ -3,29 +3,6 @@ define ([],function() {
 		constructor() {
 			this.database = null;
 			this.highScores = null;
-			this.currentGameHighScores = var currentGameHighScores = {
-				completionPercentage: 0,
-				completions: 0,
-				firstDowns: 0,
-				fourthDowns: 0,
-				fieldGoals: 0,
-				interceptions: 0,
-				longestFieldGoal: 0,
-				longestKickReturn: 0,
-				longestPass: 0,
-				longestRun: 0,
-				margin: 0,
-				passingTDs: 0,
-				passingYards:0,
-				points: 0,
-				pointsAllowed: 0,
-				rushingTDs: 0,
-				rushingYards: 0,
-				sacks: 0,
-				yards: 0,
-				yardsPerPass: 0,
-				yardsPerRush: 0,
-			}
 			this.messages = [];
 		}
 		
