@@ -33,11 +33,14 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 		addPlay(endedBy, boxScore, playerName) {
 			this.totalPlays++;
 			if(endedBy == Enums.playEndedBy.madeFieldGoal) {
+				var fieldGoalLength = (100 - this.currentYardLine) + 17;
 				this.currentPlay.down++;
-				this.currentPlay.playSummary = "" + ((100 - this.currentYardLine) + 17) + " yard field goal attempt is good!";
+				this.currentPlay.playSummary = "" + fieldGoalLength + " yard field goal attempt is good!";
 				this.currentPlay.result = Enums.playResult.fieldGoal;
 				this.clock.runOffClock();
 				this.clock.createTimeLabel();
+				if(this.boxScore.longestFieldGoal < fieldGoalLength) this.boxScore.longestFieldGoal = fieldGoalLength;
+				this.boxScore.fieldGoals++;
 			}
 			else if(endedBy == Enums.playEndedBy.missedFieldGoal) {
 				this.currentPlay.down++;

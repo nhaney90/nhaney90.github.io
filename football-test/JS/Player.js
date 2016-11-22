@@ -18,9 +18,11 @@ define (["JS/Token.js", "JS/Ball.js"],function(Token, Ball) {
 		}
 
 		kick(yardline) {
-			yardline -= 17;
 			var randomValue = Math.floor(Math.random() * 100) + 1;
-			var equation = 100 - ((-0.0188 * (yardline * yardline)) + (4.3453 * yardline) - 130.26);
+			//y = 0.0013x**3 - 0.3229x**2 + 28.122x - 757.77
+			var equation = 100 - ((0.0013 * (yardline * yardline * yardline)) - (0.3229 * (yardline * yardline)) + (28.122 * yardline) - 757.77);
+			console.log("Random Value: ", randomValue);
+			console.log("Equation: ", equation);
 			
 			if(randomValue > equation) return true;
 			else return false;
