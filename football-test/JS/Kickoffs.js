@@ -4,7 +4,8 @@ define (["JS/Ball.js", "JS/LB.js", "JS/Player.js", "JS/Utils/Enums.js"],function
 			this.game = game;
 			this.ball = null;
 			this.kickingTeam = null;
-			this.kickReturn = false;
+			this.kickReturn = true;
+			this.kickReturnDefense = [];
 		}
 		
 		getKickoffDistance() {
@@ -17,7 +18,8 @@ define (["JS/Ball.js", "JS/LB.js", "JS/Player.js", "JS/Utils/Enums.js"],function
 				var y = Math.floor(Math.random() * 3);
 				var x = Math.floor(Math.random() * 10);
 				if(this.game.checkOccupiedTiles(this.game.tiles[y][x].id, Enums.tokenEnum.defender) == Enums.tileEnum.open){
-					this.game.defenders[Object.keys(this.game.defenders)[index]] = new LB(this.game.tiles[y][x]);
+					this.game.defenders[Object.keys(this.game.defenders)[index]] = new LB(this.game.tiles[y][x], index);
+					this.kickReturnDefense.push(Object.keys(this.game.defenders)[index]);
 					success = true;
 				}
 			}
@@ -58,6 +60,8 @@ define (["JS/Ball.js", "JS/LB.js", "JS/Player.js", "JS/Utils/Enums.js"],function
 					kickoff.ball.kickOff(true).then(function() {
 						kickoff.game.readUserInput();
 						kickoff.game.ballSnapped = true;
+						kickoff.game.stats.createDrive(kickoff.getKickoffDistance());
+						kickoff.game.stats.currentDrive.startPlay();
 					});
 				}
 				else {

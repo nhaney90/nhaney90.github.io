@@ -12,7 +12,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			this.player = null;
 			this.ballInAir = false;
 			this.stats = new Stats(playerName);
-			this.stats.createDrive(25);
+			//this.stats.createDrive(25);
 			this.playPaused = true;
 			this.gameLoopCounter = 0;
 			this.gameLoopDefenderMove = 0;
@@ -83,6 +83,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 		}
 		
 		checkCode() {
+			console.log(this.currentKeyCode);
 			switch(this.currentKeyCode) {
 				//space - pass ball
 				case 32: {
@@ -129,7 +130,6 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 				}
 				else {
 					if(this.gameLoopCounter == 7) {
-						console.log(this.gameLoopSeconds);
 						if(this.gameLoopSeconds < 6) {
 							this.kickoffs.addRandomDefender(this.gameLoopSeconds);
 						}
@@ -201,7 +201,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 				this.player.move(tile);
 				if(direction == Enums.playerMovement.left) this.stats.currentDrive.currentPlay.yards += 1;
 				else if(direction == Enums.playerMovement.right) this.stats.currentDrive.currentPlay.yards -=1;
-				if(tile.x < 7) {
+				if(tile.x < 7 && this.wr) {
 					this.player.canPass = false;
 					if(this.wr.element)this.wr.stopRoute();
 				}
@@ -236,7 +236,6 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			while(success == false) {
 				var smallest = null;
 				this.currentDefender = this.defenders[this.selectRandomDefender()];
-				console.log(this.currentDefender);
 				if(this.currentDefender.currentTile.x + 1 < 10) {
 					smallest = this.findSmallestFScore(smallest, this.tiles[this.currentDefender.currentTile.y][this.currentDefender.currentTile.x+1]);
 				}
@@ -249,21 +248,26 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 				if(this.currentDefender.currentTile.y - 1 > -1) {
 					smallest = this.findSmallestFScore(smallest, this.tiles[this.currentDefender.currentTile.y - 1][this.currentDefender.currentTile.x]);
 				}
-				console.log(smallest.fScore);
-				console.log(this.currentDefender.reactZone);
 				if(smallest.fScore <= this.currentDefender.reactZone) {
+					success = true;
+				}
+				if(this.kickoffs.kickReturn == true && this.kickoffs.kickReturnDefense.length < 6) {
 					success = true;
 				}
 			}
 			this.determineOutcomeDefender(this.checkOccupiedTiles(smallest.id, Enums.tokenEnum.defender), smallest);
 		}
 		
+		//Move the player to the new position
 		movePlayer(direction) {
+			//Prevent the player from moving if the ball has already been thrown
 			if(this.ballInAir == false) {
 				if(direction == Enums.playerMovement.left) {
+					//wrap the player around the screen to the right
 					if(this.player.currentTile.x == 0) {
 						this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][9].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y][9], direction);
 					}
+					//move the player one space to the left
 					else {
 						this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][this.player.currentTile.x - 1].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y][this.player.currentTile.x - 1], direction);
 					}
@@ -272,6 +276,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 					if((this.player.currentTile.y - 1) > -1 && this.ballSnapped) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y - 1][this.player.currentTile.x].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y - 1][this.player.currentTile.x], direction);
 				}
 				else if(direction == Enums.playerMovement.right) {
+					//Check to see the player can move backwards
 					if(this.player.currentTile.x + 1 < 10 && this.ballSnapped) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][this.player.currentTile.x + 1].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y][this.player.currentTile.x + 1],direction);
 					else if(this.player.currentTile.x + 1 > 9 && this.ballSnapped && this.player.canPass == false) this.determineOutcomePlayer(this.checkOccupiedTiles(this.tiles[this.player.currentTile.y][0].id, Enums.tokenEnum.player), this.tiles[this.player.currentTile.y][0],direction);
 				}
@@ -281,15 +286,18 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			}
 		}
 		
+		//Read the user input.
 		readUserInput() {
 			(function(game){
 				$(window).on("keydown", function(evt) {
 					$(".helpBtns.btn.btn-default").blur();
+					//Hold the last valid key that was pressed in the currentKeyCode variable
 					if(game.validKeys.indexOf(evt.keyCode) > -1) game.currentKeyCode = evt.keyCode;
 				});
 			}(this));
 		}
 		
+		//Resets tokens to their initial location
 		resetTokens() {
 			this.player.removeElement(this.player.element);
 			this.player = null;
@@ -305,18 +313,23 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			this.defenders = {RDE:null,LDE:null,DT:null,LB:null,CB:null,FS:null}
 		}
 		
+		//Reads from the WRs predetermined route and moves the WR
 		runRoute() {
+			//If the WR has not yet finished his route
 			if(this.wr.currentRoute.nodes.length > 0) {
+				//Get the next route position
 				var node = this.wr.currentRoute.nodes[0];
-				var occupied = this.checkOccupiedTiles(this.tiles[node.y][node.x].id, Enums.tokenEnum.wr);
-				if(occupied == Enums.tileEnum.open) {
+				//If next route position is unoccupied
+				if(this.checkOccupiedTiles(this.tiles[node.y][node.x].id, Enums.tokenEnum.wr) == Enums.tileEnum.open) {
 					this.wr.currentRoute.nodes.shift();
 					this.wr.move(this.tiles[node.y][node.x]);
 				}
 			}
 		}
 		
+		//Select a random defender to move
 		selectRandomDefender() {
+			//If the player is in the pocket only move the defensive line
 			if(this.player.canPass == true) {
 				var random = Math.floor(Math.random() * 5)
 				if(random < 2) return "RDE";
@@ -326,11 +339,12 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			else if(this.kickoffs.kickReturn == true) {
 				var randomDefender = null;
 				while(randomDefender == null) {
-					var randomNumber = Math.floor(Math.random() * 6)
-					randomDefender = Object.keys(this.defenders)[randomNumber];
+					var randomNumber = Math.floor(Math.random() * this.kickoffs.kickReturnDefense.length);
+					randomDefender = this.kickoffs.kickReturnDefense[randomNumber];
 				}
 				return randomDefender;
 			}
+			//If the player has moved beyond the LOS all defenders can chase the player
 			else {
 				var random = Math.floor(Math.random() * 12)
 				if(random < 3) return "LB";
@@ -342,6 +356,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			}
 		}
 		
+		//Add tokens to the field
 		setFieldTokens() {
 			this.player = new Player(this.tiles[1][9]);
 			this.calculateFScores();
@@ -355,21 +370,29 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			this.stats.currentDrive.startPlay();
 		}
 		
+		//End the play
 		stopPlay(endedBy) {
 			this.ballSnapped = false;
+			//Immediately stop the WR from running his route
 			if(this.wr) this.wr.halt = true;
 			this.stats.checkDriveStatus(endedBy);
 		}
 		
+		//After the player competes a pass the QB and the WR are swapped.
 		swapWRAndPlayer() {
 			this.player.canPass = false;
 			this.stats.currentDrive.currentPlay.yards += (this.player.currentTile.x - this.wr.currentTile.x);
 			this.player.move(this.wr.currentTile);
+			this.wr.stopRoute();
 			if(this.stats.currentDrive.currentPlay.yards + this.stats.currentDrive.currentYardLine >= 100) this.stopPlay(Enums.playEndedBy.touchdown);
 		}
 		
+		//Call when the player is tackled
 		tackled() {
 			this.player.addBlink();
+			console.log(this.currentDefender);
+			console.log(this.defenders);
+			//Determine if the player was sacked
 			if(this.player.canPass) this.stopPlay(Enums.playEndedBy.sack);
 			else this.stopPlay(Enums.playEndedBy.tackle);
 		}

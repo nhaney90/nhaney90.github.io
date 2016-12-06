@@ -1,9 +1,10 @@
 define (["JS/Defender.js"],function(Defender) {
 	return class LB extends Defender {
-		constructor(tile) {
+		constructor(tile, id) {
 			super();
-			this.elementId = "lb";
-			this.elementHTML = "<div id='lb' class='token defender'>LB</div>";
+			
+			this.elementId = "lb" + id
+			this.elementHTML = "<div id='" + this.elementId + "' class='token defender'>LB</div>";
 			this.element = null;
 			this.currentTile = tile 
 			this.addElement(this.currentTile.element, this.elementHTML);
@@ -11,6 +12,7 @@ define (["JS/Defender.js"],function(Defender) {
 			this.moved = false;
 			this.moveInterval = Math.floor(Math.random() * 3) + 2;
 			this.throwingLaneTile = null;
+			this.interval = 800
 		}
 		
 		enterThrowingLane(game) {
