@@ -20,6 +20,8 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 		
 		startPlay() {
 			this.currentPlay = new Play();
+			if(this.plays.length == 0) this.currentPlay.yards = 0;
+			else this.currentPlay.yards = -2;
 			this.currentPlay.startTime = this.clock.getCurrentTime();
 			this.currentPlay.down = this.currentDown;
 			this.currentPlay.distance = this.currentDistance;
@@ -54,7 +56,7 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 				this.currentPlay.result = Enums.playResult.kickReturn;
 				console.log(this.currentPlay.yards);
 				console.log(this.currentYardLine);
-				if(this.currentPlay.yards >= 0 ) {
+				if(this.currentYardLine >= 0 ) {
 					boxScore.returns++;
 					boxScore.returnYards += this.currentPlay.yards;
 					this.setCurrentYardLine(this.currentPlay.yards);
