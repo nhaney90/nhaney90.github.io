@@ -120,7 +120,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 						else this.defenders.LB.moveInterval++;
 					}
 					if(this.gameLoopCounter == 1) {
-						this.gameLoopDefenderMove = Math.floor(Math.random() * 2) + 6;
+						this.gameLoopDefenderMove = Math.floor(Math.random() * 2) + 3;
 						console.log(this.gameLoopDefenderMove);
 					}
 					if(this.gameLoopCounter == this.gameLoopDefenderMove) {
