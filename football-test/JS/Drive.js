@@ -49,6 +49,26 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 				this.clock.runOffClock();
 				this.clock.createTimeLabel();
 			}
+			else if(this.plays.length == 0) {
+				this.currentPlay.down=0;
+				this.currentPlay.result = Enums.playResult.kickReturn;
+				if(this.currentPlay.yards > -1 ) {
+					boxScore.returns++;
+					boxScore.returnYards += this.currentPlay.yards;
+					this.setCurrentYardLine(this.currentPlay.yards);
+					if(boxScore.longestReturn < this.currentPlay.yards) boxScore.longestReturn = this.currentPlay.yards;
+					this.currentPlay.playSummary = playerName + " returns the kickoff " + this.currentPlay.yards + " yards";
+					if(endedBy == Enums.playEndedBy.touchdown) {
+						boxScore.returnTds++;
+						this.currentPlay.playSummary += " for a touchdown!";
+						this.currentPlay.result = Enums.playResult.touchdown;
+					}
+				}
+				else {
+					this.currentPlay.playSummary = playerName + " downs the ball in the endzone for a touchback";
+					this.setCurrentYardLine(25);
+				}
+			}
 			else {
 				this.yards += this.currentPlay.yards;
 				if(this.currentPlay.down == 3) boxScore.thirdDowns.atts++;

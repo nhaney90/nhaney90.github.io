@@ -1,10 +1,10 @@
 define (["JS/Defender.js"],function(Defender) {
 	return class LB extends Defender {
-		constructor(tile, id) {
+		constructor(tile, id, label) {
 			super();
 			
 			this.elementId = "lb" + id
-			this.elementHTML = "<div id='" + this.elementId + "' class='token defender'>LB</div>";
+			this.elementHTML = "<div id='" + this.elementId + "' class='token defender'>" + label + "</div>";
 			this.element = null;
 			this.currentTile = tile 
 			this.addElement(this.currentTile.element, this.elementHTML);

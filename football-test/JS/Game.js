@@ -12,7 +12,6 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			this.player = null;
 			this.ballInAir = false;
 			this.stats = new Stats(playerName);
-			//this.stats.createDrive(25);
 			this.playPaused = true;
 			this.gameLoopCounter = 0;
 			this.gameLoopDefenderMove = 0;
@@ -29,7 +28,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			this.defenders.LDE = new LDE(this.tiles[0][6]);
 			this.defenders.RDE = new RDE(this.tiles[2][6]);
 			this.defenders.DT = new DT(this.tiles[1][6]);
-			this.defenders.LB = new LB(this.tiles[1][4]);
+			this.defenders.LB = new LB(this.tiles[1][4], "", "LB");
 			this.defenders.CB = new CB(this.tiles[0][2]);
 			this.defenders.FS = new FS(this.tiles[2][0]);
 		}
@@ -147,14 +146,18 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 				this.currentKeyCode = null;
 				if(this.playPaused == true) {
 					this.playPaused = false;
-					this.startPlay();
+					if(this.stats.readyForKickoff == true) {
+						this.stats.readyForKickoff = false;
+						this.kickoffs.kickoffBall();
+					}
+					else this.startPlay();
 				}
 				else {
 					this.resetTokens();
-					this.setFieldTokens();
 					this.playPaused = true;
 					this.gameLoopCounter = 0;
 					this.gameLoopSeconds = 0;
+					if(this.stats.readyForKickoff == false)this.setFieldTokens();
 				}
 			}
 			else if(this.currentKeyCode == 75 && this.playPaused) {
@@ -302,11 +305,11 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			this.player.removeElement(this.player.element);
 			this.player = null;
 			this.ball = null;
-			if(this.wr.element)this.wr.stopRoute();
+			if(this.wr)this.wr.stopRoute();
 			this.wr = null;
 			this.ballInAir = false;
 			for(var defender in this.defenders) {
-				if(this.defenders.hasOwnProperty(defender)) {
+				if(this.defenders.hasOwnProperty(defender) && this.defenders[defender]) {
 					this.defenders[defender].removeElement(this.defenders[defender].element);
 				}
 			}
@@ -372,6 +375,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 		
 		//End the play
 		stopPlay(endedBy) {
+			this.kickoffs.kickReturn = false;
 			this.ballSnapped = false;
 			//Immediately stop the WR from running his route
 			if(this.wr) this.wr.halt = true;

@@ -154,7 +154,7 @@
 				game.createField("fieldContainer");
 				game.createFieldTiles();
 				//game.setFieldTokens();
-				game.kickoffs.kickoffBall();
+				//game.kickoffs.kickoffBall();
 				game.readUserInput();
 				/*game.database.initializeDatabase().then(function(response) {
 					game.database.getHighScores().then(function(scores) {
@@ -217,6 +217,26 @@
 						<tr>
 							<td class="boxscoreHeadings">Touchdowns</td>
 							<td id="rushingTdsCell"></td>
+						</tr>
+						<tr class="boxscoreBoldHeadings">
+							<td>Kick Returns</td>
+							<td id="kickReturnYardsCell"></td>
+						</tr>
+						<tr>
+							<td class="boxscoreHeadings" >Attempts</td>
+							<td id="kickReturnsCell"></td>
+						</tr>
+						<tr>
+							<td class="boxscoreHeadings" >Yards Per Return</td>
+							<td id="averageReturnCell"></td>
+						</tr>
+						<tr>
+							<td class="boxscoreHeadings" >Long</td>
+							<td id="longReturnCell"></td>
+						</tr>
+						<tr>
+							<td class="boxscoreHeadings">Touchdowns</td>
+							<td id="kickReturnTdsCell"></td>
 						</tr>
 						<tr class="boxscoreBoldHeadings">
 							<td>1st Downs</td>

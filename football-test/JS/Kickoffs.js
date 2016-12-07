@@ -4,7 +4,7 @@ define (["JS/Ball.js", "JS/LB.js", "JS/Player.js", "JS/Utils/Enums.js"],function
 			this.game = game;
 			this.ball = null;
 			this.kickingTeam = null;
-			this.kickReturn = true;
+			this.kickReturn = false;
 			this.kickReturnDefense = [];
 		}
 		
@@ -18,7 +18,7 @@ define (["JS/Ball.js", "JS/LB.js", "JS/Player.js", "JS/Utils/Enums.js"],function
 				var y = Math.floor(Math.random() * 3);
 				var x = Math.floor(Math.random() * 10);
 				if(this.game.checkOccupiedTiles(this.game.tiles[y][x].id, Enums.tokenEnum.defender) == Enums.tileEnum.open){
-					this.game.defenders[Object.keys(this.game.defenders)[index]] = new LB(this.game.tiles[y][x], index);
+					this.game.defenders[Object.keys(this.game.defenders)[index]] = new LB(this.game.tiles[y][x], index, "LB");
 					this.kickReturnDefense.push(Object.keys(this.game.defenders)[index]);
 					success = true;
 				}
@@ -26,8 +26,11 @@ define (["JS/Ball.js", "JS/LB.js", "JS/Player.js", "JS/Utils/Enums.js"],function
 		}
 		
 		kickoffBall() {
+			this.game.stats.setScoreboardLabels("--", "--", "Opp 35");
+			this.kickReturn = true;
+			this.kickReturnDefense = [];
 			this.ball = new Ball(this.game.tiles[1][3], this.game);
-			this.kickingTeam = [new LB(this.game.tiles[0][0]), new LB(this.game.tiles[1][0]), new LB(this.game.tiles[2][0])];
+			this.kickingTeam = [new LB(this.game.tiles[0][0], "", "LB"), new LB(this.game.tiles[1][0], "", "K"), new LB(this.game.tiles[2][0], "", "LB")];
 			this.kickoffAnimation();
 		}
 		
@@ -58,10 +61,16 @@ define (["JS/Ball.js", "JS/LB.js", "JS/Player.js", "JS/Utils/Enums.js"],function
 				console.log(second);
 				if(second) {
 					kickoff.ball.kickOff(true).then(function() {
-						kickoff.game.readUserInput();
 						kickoff.game.ballSnapped = true;
-						kickoff.game.stats.createDrive(kickoff.getKickoffDistance());
+						var kickoffDistance = kickoff.getKickoffDistance();
+						kickoff.game.stats.createDrive(kickoffDistance);
 						kickoff.game.stats.currentDrive.startPlay();
+						if(kickoffDistance > -1) {
+							
+						}
+						else {
+							kickoff.game.stopPlay(0);
+						}
 					});
 				}
 				else {

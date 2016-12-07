@@ -6,11 +6,13 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 			this.clock = new Clock();
 			this.score = {playerScore:0, computerScore:0};
 			this.setScore();
-			this.boxScore = {passing:0, compAtt:{comp:0, atts:0}, passTds:0, interceptions:0, sacks:0, rushing:0, rushAtts:0, rushTds:0, firstDowns:0, byRushing:0, byPassing:0,thirdDowns:{atts:0, convert:0}, fourthDowns:{atts:0, convert:0}, longestRun:0, longestPass:0, longestFieldGoal:0, fieldGoals:0};
+			this.readyForKickoff = true;
+			this.boxScore = {passing:0, compAtt:{comp:0, atts:0}, passTds:0, interceptions:0, sacks:0, rushing:0, rushAtts:0, rushTds:0, firstDowns:0, byRushing:0, byPassing:0,thirdDowns:{atts:0, convert:0}, fourthDowns:{atts:0, convert:0}, longestRun:0, longestPass:0, longestFieldGoal:0, fieldGoals:0, returnYards:0, returns:0, longestReturn:0, returnTds:0};
 			this.highScores = {completionPercentage: 0, completions: 0, fieldGoals:0, firstDowns: 0, fourthDowns: 0, fieldGoals: 0, interceptions: 0,
 				longestFieldGoal: 0, longestKickReturn: 0, longestPass: 0, longestRun: 0, margin: 0, passAttempts:0, passingTDs: 0, passingYards:0, points: 0, pointsAllowed: 0, rushingTDs: 0, rushingYards: 0, rushAttempts:0, sacks: 0, yards: 0, yardsPerPass: 0, yardsPerRush: 0}
 			this.setBoxScore();
 			this.playerName = playerName;
+			this.setScoreboardLabels("--", "--", "Opp 35");
 			$("#playerNameScoreboardLabel").text(this.playerName);
 		}
 		
@@ -19,7 +21,7 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 			this.boxScore = result.boxScore;
 			this.setBoxScore();
 			$("#playResult").text(result.playSummary);
-			$("#playByPlayTable").append('<tr><td class="playByPlayItem">' + (this.createLabelFriendlyDownNumber(this.currentDrive.currentPlay.down)) + ' down: ' + result.playSummary + '</td></tr>');
+			$("#playByPlayTable").append('<tr><td class="playByPlayItem">' + (this.createLabelFriendlyDownNumber(this.currentDrive.currentPlay.down)) + ': ' + result.playSummary + '</td></tr>');
 			if(endedBy == Enums.playEndedBy.sack) {
 				this.score.computerScore += 2;
 				this.setScore();
@@ -28,19 +30,19 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 				this.score.computerScore += 4;
 				this.setScore();
 				this.endDrive();
-				this.createDrive(25);
+				this.readyForKickoff = true;
 			}
 			else if(result.playResult == Enums.playResult.touchdown) {
 				this.score.playerScore += 7;
 				this.setScore();
 				this.endDrive();
-				this.createDrive(25);
+				this.readyForKickoff = true;
 			}
 			else if(result.playResult == Enums.playResult.fieldGoal) {
 				this.score.playerScore += 3;
 				this.setScore();
 				this.endDrive();
-				this.createDrive(25);
+				this.readyForKickoff = true;
 			}
 			else {
 				this.setScoreboardLabels(this.currentDrive.currentDown, this.currentDrive.currentDistance, this.currentDrive.getNormalizedYardLine(this.currentDrive.currentYardLine));
@@ -60,10 +62,11 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 		}
 		
 		createLabelFriendlyDownNumber(down) {
-			if(down == 1) return "1st";
-			else if(down == 2) return "2nd";
-			else if(down == 3) return "3rd";
-			else if(down == 4) return "4th";
+			if(down == 1) return "1st Down";
+			else if(down == 2) return "2nd Down";
+			else if(down == 3) return "3rd Down";
+			else if(down == 4) return "4th Down";
+			else if(down == 0) return "Kickoff";
 			return "error";
 		}
 		
@@ -115,6 +118,11 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 			$("#rushingAttsCell").text(this.boxScore.rushAtts);
 			$("#yprCell").text(Math.round((this.boxScore.rushing / this.boxScore.rushAtts) * 10) / 10);
 			$("#rushingTdsCell").text(this.boxScore.rushTds);
+			$("#kickReturnYardsCell").text(this.boxScore.returnYards);
+			$("#kickReturnsCell").text(this.boxScore.returns);
+			$("#longReturnCell").text(this.boxScore.longestReturn);
+			$("#averageReturnCell").text(Math.round((this.boxScore.returnYards / this.boxScore.returns) * 10) / 10);
+			$("#kickReturnTdsCell").text(this.boxScore.returnTds);
 			$("#firstDownsCell").text(this.boxScore.firstDowns);
 			$("#byRushingCell").text(this.boxScore.byRushing);
 			$("#byPassingCell").text(this.boxScore.byPassing);
