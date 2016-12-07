@@ -158,6 +158,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 					this.gameLoopCounter = 0;
 					this.gameLoopSeconds = 0;
 					if(this.stats.readyForKickoff == false)this.setFieldTokens();
+					else this.kickoffs.addKickoffTokens();
 				}
 			}
 			else if(this.currentKeyCode == 75 && this.playPaused) {

@@ -151,6 +151,7 @@
 				var game = new Game(playerName);
 				game.createField("fieldContainer");
 				game.createFieldTiles();
+				game.kickoffs.addKickoffTokens();
 				game.readUserInput();
 				game.database.initializeDatabase().then(function(response) {
 					game.database.getHighScores().then(function(scores) {
