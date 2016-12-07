@@ -145,7 +145,7 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 				}
 				this.gameLoopCounter++;
 			}
-			else if(this.currentKeyCode == 13){
+			else if(this.currentKeyCode == 13 && this.kickoffs.kickReturn == false){
 				this.currentKeyCode = null;
 				if(this.playPaused == true) {
 					this.playPaused = false;
