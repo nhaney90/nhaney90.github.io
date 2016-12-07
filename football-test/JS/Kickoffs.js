@@ -65,6 +65,7 @@ define (["JS/Ball.js", "JS/LB.js", "JS/Player.js", "JS/Utils/Enums.js"],function
 						var kickoffDistance = kickoff.getKickoffDistance();
 						kickoff.game.stats.createDrive(kickoffDistance);
 						kickoff.game.stats.currentDrive.startPlay();
+						console.log(kickoffDistance);
 						if(kickoffDistance > -1) {
 							
 						}

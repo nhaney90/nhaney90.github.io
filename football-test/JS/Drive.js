@@ -52,7 +52,9 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 			else if(this.plays.length == 0) {
 				this.currentPlay.down=0;
 				this.currentPlay.result = Enums.playResult.kickReturn;
-				if(this.currentPlay.yards > -1 ) {
+				console.log(this.currentPlay.yards);
+				console.log(this.currentYardLine);
+				if(this.currentPlay.yards >= 0 ) {
 					boxScore.returns++;
 					boxScore.returnYards += this.currentPlay.yards;
 					this.setCurrentYardLine(this.currentPlay.yards);
@@ -66,7 +68,7 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 				}
 				else {
 					this.currentPlay.playSummary = playerName + " downs the ball in the endzone for a touchback";
-					this.setCurrentYardLine(25);
+					this.currentYardLine = 25;
 				}
 			}
 			else {
