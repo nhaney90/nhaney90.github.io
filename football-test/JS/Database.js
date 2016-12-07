@@ -66,9 +66,6 @@ define ([],function() {
 		checkHighScores(currentGameHighScores, currentPlayer) {
 			for(var record in currentGameHighScores) {
 				if(currentGameHighScores.hasOwnProperty(record)) {
-					console.log(record);
-					console.log(currentGameHighScores[record]);
-					console.log(this.highScores[record].score);
 					if(record == "interceptions" || record == "sacks" || record == "pointsAllowed") {
 						if(currentGameHighScores[record] < this.highScores[record].score) this.setNewHighScore(currentGameHighScores[record], this.highScores[record], record, currentPlayer);
 					}
@@ -179,7 +176,23 @@ define ([],function() {
 
 			$("#r22score").text(this.highScores.completions.score);
 			$("#r22player").text(this.highScores.completions.player);
-			$("#r22date").text(this.highScores.completions.date);				
+			$("#r22date").text(this.highScores.completions.date);
+
+			$("#r23score").text(this.highScores.returnYards.score);
+			$("#r23player").text(this.highScores.returnYards.player);
+			$("#r23date").text(this.highScores.returnYards.date);
+
+			$("#r24score").text(this.highScores.yardsPerReturn.score);
+			$("#r24player").text(this.highScores.yardsPerReturn.player);
+			$("#r24date").text(this.highScores.yardsPerReturn.date);	
+
+			$("#r25score").text(this.highScores.returnTDs.score);
+			$("#r25player").text(this.highScores.returnTDs.player);
+			$("#r25date").text(this.highScores.returnTDs.date);
+
+			$("#r26score").text(this.highScores.longestReturn.score);
+			$("#r26player").text(this.highScores.longestReturn.player);
+			$("#r26date").text(this.highScores.longestReturn.date);
 		}
 	}
 });

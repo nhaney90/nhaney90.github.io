@@ -141,26 +141,22 @@
 	<script>
 
 		require(["JS/Game"],function(Game){
-			//$("#playerNameModal").modal('show');
+			$("#playerNameModal").modal('show');
 			$("#restartGameBtn").click(function() {location.reload();});
 			$("#beginGameBtn").click(function(){
 				createGame($("#playerNameInput").val());
 			});
 			
-			createGame("Nick");
-			
 			function createGame(playerName) {
 				var game = new Game(playerName);
 				game.createField("fieldContainer");
 				game.createFieldTiles();
-				//game.setFieldTokens();
-				//game.kickoffs.kickoffBall();
 				game.readUserInput();
-				/*game.database.initializeDatabase().then(function(response) {
+				game.database.initializeDatabase().then(function(response) {
 					game.database.getHighScores().then(function(scores) {
 						console.log(scores);
 					});
-				});*/
+				});
 			}
 		});
 	</script>
@@ -520,6 +516,30 @@
 							<td id="r17score"></td>
 							<td id="r17player"></td>
 							<td id="r17date"></td>
+						</tr>
+						<tr>
+							<td id="r23name">Most Kick Return Yards</td>
+							<td id="r23score"></td>
+							<td id="r23player"></td>
+							<td id="r23date"></td>
+						</tr>
+						<tr>
+							<td id="r24name">Highest Yards Per Return</td>
+							<td id="r24score"></td>
+							<td id="r24player"></td>
+							<td id="r24date"></td>
+						</tr>
+						<tr>
+							<td id="r25name">Most Kick Return Touchdowns</td>
+							<td id="r25score"></td>
+							<td id="r25player"></td>
+							<td id="r25date"></td>
+						</tr>
+						<tr>
+							<td id="r26name">Longest Kick Return</td>
+							<td id="r26score"></td>
+							<td id="r26player"></td>
+							<td id="r26date"></td>
 						</tr>
 						<tr>
 							<td id="r18name">Most First Downs</td>

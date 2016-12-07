@@ -9,7 +9,7 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 			this.readyForKickoff = true;
 			this.boxScore = {passing:0, compAtt:{comp:0, atts:0}, passTds:0, interceptions:0, sacks:0, rushing:0, rushAtts:0, rushTds:0, firstDowns:0, byRushing:0, byPassing:0,thirdDowns:{atts:0, convert:0}, fourthDowns:{atts:0, convert:0}, longestRun:0, longestPass:0, longestFieldGoal:0, fieldGoals:0, returnYards:0, returns:0, longestReturn:0, returnTds:0};
 			this.highScores = {completionPercentage: 0, completions: 0, fieldGoals:0, firstDowns: 0, fourthDowns: 0, fieldGoals: 0, interceptions: 0,
-				longestFieldGoal: 0, longestKickReturn: 0, longestPass: 0, longestRun: 0, margin: 0, passAttempts:0, passingTDs: 0, passingYards:0, points: 0, pointsAllowed: 0, rushingTDs: 0, rushingYards: 0, rushAttempts:0, sacks: 0, yards: 0, yardsPerPass: 0, yardsPerRush: 0}
+				longestFieldGoal: 0, longestPass: 0, longestRun: 0, margin: 0, passAttempts:0, passingTDs: 0, passingYards:0, points: 0, pointsAllowed: 0, rushingTDs: 0, rushingYards: 0, rushAttempts:0, sacks: 0, yards: 0, yardsPerPass: 0, yardsPerRush: 0, returnYards: 0, longestReturn: 0, yardsPerReturn: 0, returnTDs:0}
 			this.setBoxScore();
 			this.playerName = playerName;
 			this.setScoreboardLabels("--", "--", "Opp 35");
@@ -82,28 +82,34 @@ define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],functio
 		}
 		
 		finalizeStats() {
-			this.highScores.yards = this.boxScore.passing + this.boxScore.rushing;
-			this.highScores.passingYards = this.boxScore.passing;
-			this.highScores.passAttempts = this.boxScore.compAtt.atts;
-			this.highScores.completionPercentage = (Math.round((this.boxScore.compAtt.comp / this.boxScore.compAtt.atts) * 10) / 10) * 100;
-			this.highScores.yardsPerPass = this.highScores.passAttempts > 7 ? Math.round((this.boxScore.passing / this.boxScore.compAtt.atts) * 10) / 10 : 0;
-			this.highScores.passingTDs = this.boxScore.passTds;
-			this.highScores.rushingTDs = this.boxScore.rushTds;
-			this.highScores.interceptions = this.boxScore.interceptions;
-			this.highScores.sacks = this.boxScore.sacks;
-			this.highScores.rushingYards = this.boxScore.rushing;
-			this.highScores.rushAttempts = this.boxScore.rushAtts;
-			this.highScores.yardsPerRush = this.highScores.rushAttempts > 4 ? Math.round((this.boxScore.rushing / this.boxScore.rushAtts) * 10) / 10 : 0;
-			this.highScores.firstDowns = this.boxScore.firstDowns;
-			this.highScores.fourthDowns = this.boxScore.fourthDowns.convert;
-			this.highScores.longestRun = this.boxScore.longestRun;
-			this.highScores.longestPass = this.boxScore.longestPass;
-			this.highScores.completions = this.boxScore.compAtt.comp;
-			this.highScores.pointsAllowed =  this.score.computerScore;
-			this.highScores.points = this.score.playerScore;
-			this.highScores.margin = this.highScores.points - this.highScores.pointsAllowed;
-			this.highScores.fieldGoals = this.boxScore.fieldGoals;
-			this.highScores.longestFieldGoal = this.boxScore.longestFieldGoal;
+			if(this.score.playerScore >= this.score.computerScore) {
+				this.highScores.yards = this.boxScore.passing + this.boxScore.rushing;
+				this.highScores.passingYards = this.boxScore.passing;
+				this.highScores.passAttempts = this.boxScore.compAtt.atts;
+				this.highScores.completionPercentage = (Math.round((this.boxScore.compAtt.comp / this.boxScore.compAtt.atts) * 10) / 10) * 100;
+				this.highScores.yardsPerPass = this.highScores.passAttempts > 7 ? Math.round((this.boxScore.passing / this.boxScore.compAtt.atts) * 10) / 10 : 0;
+				this.highScores.passingTDs = this.boxScore.passTds;
+				this.highScores.rushingTDs = this.boxScore.rushTds;
+				this.highScores.interceptions = this.boxScore.interceptions;
+				this.highScores.sacks = this.boxScore.sacks;
+				this.highScores.rushingYards = this.boxScore.rushing;
+				this.highScores.rushAttempts = this.boxScore.rushAtts;
+				this.highScores.yardsPerRush = this.highScores.rushAttempts > 4 ? Math.round((this.boxScore.rushing / this.boxScore.rushAtts) * 10) / 10 : 0;
+				this.highScores.firstDowns = this.boxScore.firstDowns;
+				this.highScores.fourthDowns = this.boxScore.fourthDowns.convert;
+				this.highScores.longestRun = this.boxScore.longestRun;
+				this.highScores.longestPass = this.boxScore.longestPass;
+				this.highScores.completions = this.boxScore.compAtt.comp;
+				this.highScores.pointsAllowed =  this.score.computerScore;
+				this.highScores.points = this.score.playerScore;
+				this.highScores.margin = this.highScores.points - this.highScores.pointsAllowed;
+				this.highScores.fieldGoals = this.boxScore.fieldGoals;
+				this.highScores.longestFieldGoal = this.boxScore.longestFieldGoal;
+				this.highScores.returnYards = this.boxScore.returnYards;
+				this.highScores.longestReturn = this.boxScore.longestReturn;
+				this.highScores.yardsPerReturn = Math.round((this.boxScore.returnYards / this.boxScore.returns) * 10) / 10;
+				this.highScores.returnTDs  = this.boxScore.returnTds;
+			}
 		}
 
 		setBoxScore() {
