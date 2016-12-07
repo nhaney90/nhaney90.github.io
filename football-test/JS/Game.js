@@ -82,7 +82,6 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 		}
 		
 		checkCode() {
-			console.log(this.currentKeyCode);
 			switch(this.currentKeyCode) {
 				//space - pass ball
 				case 32: {
@@ -120,10 +119,14 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 						}
 						else this.defenders.LB.moveInterval++;
 					}
-					else if(this.gameLoopCounter == 7) {
+					if(this.gameLoopCounter == 1) {
+						this.gameLoopDefenderMove = Math.floor(Math.random() * 5) + 5;
+						console.log(this.gameLoopDefenderMove);
+					}
+					if(this.gameLoopCounter == this.gameLoopDefenderMove) {
 						this.moveDefender();
 					}
-					else if(this.gameLoopCounter == 9) {
+					if(this.gameLoopCounter == 9) {
 						if(!this.wr.halt) this.runRoute();
 					}
 				}
