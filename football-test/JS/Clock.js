@@ -1,7 +1,7 @@
 define ([],function() {
 	return class Clock {
 		constructor() {
-			this.quarterLength = 300;
+			this.quarterLength = 360;
 			this.timeRemaining = this.quarterLength;
 			this.createTimeLabel();
 			this.gameOver = false;
