@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Define custom Popup actions - 4.1</title>
+  <title>Add and Remove Attachments With 4.2</title>
 
   <style>
     html, body, #viewDiv {
@@ -49,11 +49,11 @@
 	}
   </style>
   
-  <link rel="stylesheet" href="https://js.arcgis.com/4.1/dijit/themes/claro/claro.css">
-  <link rel="stylesheet" href="https://js.arcgis.com/4.1/esri/css/main.css">
+  <link rel="stylesheet" href="https://js.arcgis.com/4.2/dijit/themes/claro/claro.css">
+  <link rel="stylesheet" href="https://js.arcgis.com/4.2/esri/css/main.css">
   
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-  <script src="https://js.arcgis.com/4.1/"></script>
+  <script src="https://js.arcgis.com/4.2/"></script>
 
   <script>
     require([
@@ -78,8 +78,8 @@
 		var view = new MapView({
 			container: "viewDiv",
 			map: map,
-			center: [-117.08, 34.10],
-			zoom: 12
+			center: [-100, 38],
+			zoom: 4
 		});
 	  
 		var addAttachments = {
@@ -145,7 +145,6 @@
 			});
 			
 			$(".delete-attachment").click(function(evt) {
-				console.log(evt);
 				deleteAttachment(evt.target.attributes.value.nodeValue, evt.target);
 			});
 		}
@@ -164,7 +163,6 @@
 			$.get(url, function(data, status) {
 				var json = JSON.parse(data);
 				$(element).parent().remove();
-				if(json.deleteAttachmentResults.length > 0) alert("File Deleted");
 			});
 		}
 	  
@@ -179,7 +177,6 @@
 				console.log(request);
 				var json = JSON.parse(request.responseText);
 				if(json.addAttachmentResult.success == true) {
-					alert("File Added Successfully!");
 					updatePopup();
 				}
 				else {
