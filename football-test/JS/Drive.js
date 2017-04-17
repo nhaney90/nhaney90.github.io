@@ -1,3 +1,7 @@
+/****************************************************************************************************************************************************
+Class that represents a single drive. Also determines the outcome of a drive, keeps track of individual plays and determines the outcome of each play
+*****************************************************************************************************************************************************/
+
 define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 	return class Drive {
 		constructor(yardLine, clock) {
@@ -18,9 +22,12 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 			this.clock = clock;
 		}
 		
+		//Creates a new play and updates the currentPlay property
 		startPlay() {
 			this.currentPlay = new Play();
+			//If the play's length is zero, this is a kickoff return 
 			if(this.plays.length == 0) this.currentPlay.yards = 0;
+			//If the play is not a kickoff return, start the player two yards behind the line of scrimmage
 			else this.currentPlay.yards = -2;
 			this.currentPlay.startTime = this.clock.getCurrentTime();
 			this.currentPlay.down = this.currentDown;
@@ -28,12 +35,12 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 			this.currentPlay.yardLine = this.currentYardLine;
 		}
 		
-		stopPlay(yards) {
-			this.addPlay();
-		}
-		
+		//Add the current play to the plays array
+		//Also determines the outcome of the play and returns the result to the instance of the Stats class that called it
 		addPlay(endedBy, boxScore, playerName) {
 			this.totalPlays++;
+			
+			//If the player kicked and made a field goal
 			if(endedBy == Enums.playEndedBy.madeFieldGoal) {
 				var fieldGoalLength = (100 - this.currentYardLine) + 17;
 				this.currentPlay.down++;
@@ -44,6 +51,8 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 				if(boxScore.longestFieldGoal < fieldGoalLength) boxScore.longestFieldGoal = fieldGoalLength;
 				boxScore.fieldGoals++;
 			}
+			
+			//If the player kicked and missed a field goal
 			else if(endedBy == Enums.playEndedBy.missedFieldGoal) {
 				this.currentPlay.down++;
 				this.currentPlay.playSummary = "" + ((100 - this.currentYardLine) + 17) + " yard field goal attempt is no good!";
@@ -51,38 +60,48 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 				this.clock.runOffClock();
 				this.clock.createTimeLabel();
 			}
+			
+			//If this is the first play of the drive, the play was a kick return
 			else if(this.plays.length == 0) {
 				this.currentPlay.down=0;
 				this.currentPlay.result = Enums.playResult.kickReturn;
-				console.log(this.currentPlay.yards);
-				console.log(this.currentYardLine);
+				
+				//If player returned the kick
 				if(this.currentYardLine >= 0 ) {
 					boxScore.returns++;
 					boxScore.returnYards += this.currentPlay.yards;
 					this.setCurrentYardLine(this.currentPlay.yards);
 					if(boxScore.longestReturn < this.currentPlay.yards) boxScore.longestReturn = this.currentPlay.yards;
 					this.currentPlay.playSummary = playerName + " returns the kickoff " + this.currentPlay.yards + " yards";
+					//If the player returned the kick for a touchdown
 					if(endedBy == Enums.playEndedBy.touchdown) {
 						boxScore.returnTds++;
 						this.currentPlay.playSummary += " for a touchdown!";
 						this.currentPlay.result = Enums.playResult.touchdown;
 					}
 				}
+				//If the kick was downed in the endzone
 				else {
 					this.currentPlay.playSummary = playerName + " downs the ball in the endzone for a touchback";
 					this.currentYardLine = 25;
 				}
 			}
+			
+			//This was not a special teams play
 			else {
 				this.yards += this.currentPlay.yards;
 				if(this.currentPlay.down == 3) boxScore.thirdDowns.atts++;
 				else if(this.currentPlay.down == 4) boxScore.fourthDowns.atts++;
+				
+				//Indicates this was a pass play
 				if(this.currentPlay.type) {
 					if(boxScore.longestPass < this.currentPlay.yards) boxScore.longestPass = this.currentPlay.yards;
 					this.passPlays++;
 					boxScore.compAtt.atts++;
 					boxScore.compAtt.comp++;
 				}
+				
+				//Indicates this was a run play
 				else {
 					if(boxScore.longestRun < this.currentPlay.yards) boxScore.longestRun = this.currentPlay.yards;
 					this.currentPlay.type = Enums.playType.run;
@@ -90,7 +109,11 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 					boxScore.rushAtts++;
 					boxScore.rushing += this.currentPlay.yards;
 				}
+				
+				//Move the line of scrimmage based on the yards gained during the play
 				this.setCurrentYardLine(this.currentPlay.yards);
+				
+				//Check if the player was sacked
 				if(endedBy == Enums.playEndedBy.sack) {
 					this.currentPlay.playSummary = playerName + " sacked for a loss of " + this.currentPlay.yards + " yards!";
 					this.currentDown++;
@@ -98,63 +121,90 @@ define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
 					this.currentDistance -= this.currentPlay.yards;
 					boxScore.sacks++;
 				}
+				
+				//Check to see if the player threw an incomplete pass
 				else if(endedBy == Enums.playEndedBy.incomplete) {
 					this.currentPlay.playSummary = "Incomplete pass";
 					this.currentPlay.result = Enums.playResult.none;
 					this.currentDown++;
 					boxScore.compAtt.comp--;
 				}
+				
+				//Check to see if the player threw an interception
 				else if(endedBy == Enums.playEndedBy.interception) {
 					this.currentPlay.playSummary = playerName + " pass intercepted!";
 					this.currentPlay.result = Enums.playResult.turnover
 					boxScore.compAtt.comp--;
 					boxScore.interceptions++;
 				}
+				
+				//Cool, you were not sacked, intercepted or threw an incompletion
 				else {
+					//You have either gained or lost yards
 					this.currentPlay.playSummary = playerName + " " + (this.currentPlay.type == 0 ? "runs" : "passes") + " for " +  this.currentPlay.yards + " yards";
 					if(this.currentPlay.type == Enums.playType.pass) boxScore.passing += this.currentPlay.yards;
 					boxScore.totalYards += this.currentPlay.yards;
-					if(endedBy == Enums.playEndedBy.touchdown) {
-						this.currentPlay.playSummary += " for a touchdown!";
-						this.currentPlay.result = Enums.playResult.touchdown;
-						this.currentPlay.type == Enums.playType.run ? boxScore.rushTds++ : boxScore.passTds++;
+					
+					//If the play resulted in a first down or a touchdown
+					if(endedBy == Enums.playEndedBy.touchdown || (this.currentDistance - this.currentPlay.yards) <= 0) {
+						
+						//Touchdown
+						if(endedBy == Enums.playEndedBy.touchdown) {
+							this.currentPlay.playSummary += " for a touchdown!";
+							this.currentPlay.result = Enums.playResult.touchdown;
+							this.currentPlay.type == Enums.playType.run ? boxScore.rushTds++ : boxScore.passTds++;
+						}
+						
+						//First down
+						else {
+							this.currentDown = 1;
+							this.currentDistance = 10;
+							this.currentPlay.result = Enums.playResult.firstDown;
+							this.currentPlay.playSummary += " for a first down!";
+							boxScore.firstDowns++;
+							this.currentPlay.type == Enums.playType.run ? boxScore.byRushing++ : boxScore.byPassing++;
+						}
+						
+						//Yes, I count touchdowns as first downs
 						if(this.currentPlay.down == 3) boxScore.thirdDowns.convert++;
 						else if(this.currentPlay.down == 4) boxScore.fourthDowns.convert++;
 					}
-					else if(this.currentDistance - this.currentPlay.yards <= 0) {
-						this.currentDown = 1;
-						this.currentDistance = 10;
-						this.currentPlay.result = Enums.playResult.firstDown;
-						this.currentPlay.playSummary += " for a first down!";
-						boxScore.firstDowns++;
-						this.currentPlay.type == Enums.playType.run ? boxScore.byRushing++ : boxScore.byPassing++;
-						if(this.currentPlay.down == 3) boxScore.thirdDowns.convert++;
-						else if(this.currentPlay.down == 4) boxScore.fourthDowns.convert++;
-					}
+					
+					//The play did not result in a first down or touchdown
 					else {
 						this.currentDistance -= this.currentPlay.yards;
 						this.currentDown++;
 						this.currentPlay.result = Enums.playResult.none;
-						this.currentPlay.playSummary += " to the " + (this.getNormalizedYardLine());;
+						this.currentPlay.playSummary += " to the " + (this.getNormalizedYardLine());
+						
+						//If you failed to convert a 4th down
+						if(this.currentDown > 4) {
+							if(this.currentPlay.result == Enums.playResult.none || this.currentPlay.result == Enums.playResult.incomplete) {
+								this.currentPlay.result = Enums.playResult.turnover;
+								this.currentPlay.playSummary += "Turnover on downs!";
+							}
+						}
+						
 					}
 				}	
-				if(this.currentDown > 4) {
-					if(this.currentPlay.result == Enums.playResult.none || this.currentPlay.result == Enums.playResult.incomplete) {
-						this.currentPlay.result = Enums.playResult.turnover;
-						this.currentPlay.playSummary += "Turnover on downs!";
-					}
-				}
 			}
+			
+			//Get the time the play ended
 			this.currentPlay.endTime = this.clock.getCurrentTime();
 			this.plays.push(this.currentPlay);
+			
+			//Return an object representing the outcome of the play and the up-to-date boxscore
 			return {playSummary:this.currentPlay.playSummary, playResult: this.currentPlay.result, boxScore:boxScore};
 		}
 		
+		//Add the yards gained to the current yard line
 		setCurrentYardLine(yards) {
 			this.currentYardLine += yards;
 		}
 		
+		//As I record all yards as 0 - 100, this is a helper method to convert this number to the +- 50 yard values we are used to
 		getNormalizedYardLine() {
+			//If the value is greater than 50 it needs to be converted
 			if(this.currentYardLine > 50) {
 				return "Opp " + (50-(this.currentYardLine - 50));
 			}

@@ -13,6 +13,11 @@ define (["JS/Ball.js", "JS/LB.js", "JS/Player.js", "JS/Utils/Enums.js"],function
 			this.kickingTeam = [new LB(this.game.tiles[0][0], "", "LB"), new LB(this.game.tiles[1][0], "", "K"), new LB(this.game.tiles[2][0], "", "LB")];
 		}
 		
+		addFieldGoalTokens() {
+			this.ball = new Ball(this.game.tiles[1][7], this.game);
+			this.kickingTeam = [new LB(this.game.tiles[1][9], "", "K"), new LB(this.game.tiles[0][5], "", "OL"), new LB(this.game.tiles[1][5], "", "OL"), new LB(this.game.tiles[2][5], "", "OL")];
+		}
+		
 		getKickoffDistance() {
 			return Math.floor(Math.random() * 35) - 9;
 		}
@@ -37,10 +42,28 @@ define (["JS/Ball.js", "JS/LB.js", "JS/Player.js", "JS/Utils/Enums.js"],function
 			this.kickoffAnimation();
 		}
 		
+		kickFieldGoal() {
+			setTimeout(this.fieldGoalAnimation, 2000);
+		}
+		
 		removeKickingTeam() {
 			for(var i = 0; i < this.kickingTeam.length; i++) {
 				this.kickingTeam[i].removeElement(this.kickingTeam[i].element);
 			}
+		}
+		
+		fieldGoalAnimation() {
+			(function(kickoff){
+				var intervalID = setInterval(function() {
+					if(kickoff.kickingTeam[0].currentTile.x == 7) {
+						clearInterval(intervalID);
+						kickoff.kickBall("fieldGoal");
+					}
+					else {
+						kickoff.kickingTeam[0].move(kickoff.game.tiles[kickoff.kickingTeam[0].currentTile.y][kickoff.kickingTeam[0].currentTile.x - 1]);
+					}
+				}, 1000);
+			}(this));
 		}
 		
 		kickoffAnimation() {
@@ -48,7 +71,7 @@ define (["JS/Ball.js", "JS/LB.js", "JS/Player.js", "JS/Utils/Enums.js"],function
 				var intervalID = setInterval(function() {
 					if(kickoff.kickingTeam[0].currentTile.x == 3) {
 						clearInterval(intervalID);
-						kickoff.kickBall(false);
+						kickoff.kickBall("first");
 					}
 					else {
 						kickoff.kickingTeam[0].move(kickoff.game.tiles[kickoff.kickingTeam[0].currentTile.y][kickoff.kickingTeam[0].currentTile.x + 1]);
@@ -59,31 +82,31 @@ define (["JS/Ball.js", "JS/LB.js", "JS/Player.js", "JS/Utils/Enums.js"],function
 			}(this));
 		}
 		
-		kickBall(second) {
+		kickBall(param) {
 			(function(kickoff){
-				console.log(second);
-				if(second) {
+				if(param == "second") {
 					kickoff.ball.kickOff(true).then(function() {
 						kickoff.game.ballSnapped = true;
 						var kickoffDistance = kickoff.getKickoffDistance();
 						kickoff.game.stats.createDrive(kickoffDistance);
 						kickoff.game.stats.currentDrive.startPlay();
-						console.log(kickoffDistance);
-						if(kickoffDistance > -1) {
-							
-						}
-						else {
+						if(kickoffDistance < 0) {
 							kickoff.game.stopPlay(0);
 						}
 					});
 				}
-				else {
+				else if (param == "first") {
 					kickoff.ball.kickOff(false).then(function() {
 						kickoff.removeKickingTeam();
 						kickoff.ball.move(kickoff.game.tiles[1][0]);
 						kickoff.game.player = new Player(kickoff.game.tiles[1][9]);
 						kickoff.game.player.canPass = false;
-						kickoff.kickBall(true);
+						kickoff.kickBall("second");
+					});
+				}
+				else {
+					kickoff.ball.fieldGoal().then(function() {
+						kickoff.removeKickingTeam();
 					});
 				}
 			}(this));

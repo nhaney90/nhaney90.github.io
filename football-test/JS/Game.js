@@ -167,6 +167,10 @@ define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.j
 			}
 			else if(this.currentKeyCode == 75 && this.playPaused) {
 				this.currentKeyCode = null;
+				this.resetTokens();
+				this.player = new Player(this.tiles[0][7]);
+				this.kickoffs.addFieldGoalTokens();
+				this.kickoffs.kickFieldGoal();
 				this.stats.currentDrive.startPlay();
 				var fieldGoalResult = this.player.kick(this.stats.currentDrive.currentYardLine);
 				if(fieldGoalResult) this.stopPlay(Enums.playEndedBy.madeFieldGoal);

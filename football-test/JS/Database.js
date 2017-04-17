@@ -1,3 +1,7 @@
+/***************************************************************
+Class used to manage interactions with the FireBase instance
+***************************************************************/
+
 define ([],function() {
 	return class Database {
 		constructor() {
@@ -6,6 +10,7 @@ define ([],function() {
 			this.messages = [];
 		}
 		
+		//Iterate through the list of messages and display each message in the modal dialog box informing the player they have set an all time record
 		displayMessages() {
 			for(var i = 0; i < this.messages.length; i++) {
 				$("#newRecordModalDiv").append('<p style="font-size:large">' + this.messages[i] + '<p><br/>');
@@ -13,8 +18,10 @@ define ([],function() {
 			$("#recordScoreModal").modal('show');
 		}
 		
+		//Initialize the connection to FireBase
 		initializeDatabase() {
 			var db = this;
+			//Allow this connection to happen asyncronously using a promise
 			return new Promise(function(resolve, reject) {
 				(function(db){
 					var config = {
@@ -46,7 +53,10 @@ define ([],function() {
 			});
 		}
 		
+		//Get the current alltime highscores from the database
 		getHighScores() {
+
+			//The table of interest is "allTimeRecords"
 			var ref = this.database.ref("allTimeRecords");
 			var db = this;
 			return new Promise(function(resolve, reject) {
@@ -63,7 +73,9 @@ define ([],function() {
 			});
 		}
 		
+		//Loop through the highscores from this playthrough and compare them to the alltime highscores
 		checkHighScores(currentGameHighScores, currentPlayer) {
+			//Loop through the properties of the object
 			for(var record in currentGameHighScores) {
 				if(currentGameHighScores.hasOwnProperty(record)) {
 					if(record == "interceptions" || record == "sacks" || record == "pointsAllowed") {
@@ -74,9 +86,11 @@ define ([],function() {
 					}
 				}
 			}
+			//If a message is in the messages array this means a new alltime record was set.
 			if(this.messages.length > 0) this.displayMessages();
 		}
 		
+		//Create a message for each new record set. Also enter the new record information in the database
 		setNewHighScore(newRecord, oldRecord, record, currentPlayer) {
 			var date = new Date();
 			var message = currentPlayer + " has set a new record for " + oldRecord.message + " at " + newRecord + ". This replaces the old record of " + oldRecord.score + " set by " + oldRecord.player + ".";
@@ -89,6 +103,7 @@ define ([],function() {
 			});
 		}
 		
+		//Populate the alltime high score information in the modal dialog box
 		setHighScoreInformation() {
 			$("#r1score").text(this.highScores.points.score);
 			$("#r1player").text(this.highScores.points.player);

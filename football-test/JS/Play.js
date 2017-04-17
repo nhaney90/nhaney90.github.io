@@ -1,3 +1,7 @@
+/****************************************************************************
+This class essentially defines an object used to represent an individual play
+****************************************************************************/
+
 define ([],function() {
 	return class Play {
 		constructor() {
