@@ -1,0 +1,25 @@
+.post-container {
+	background-color: white;
+	width: 850px;
+	display: table;
+	margin: 0 auto;
+	margin-top: 20px;
+	padding-bottom: 20px;
+	color: black;
+}
+.post-container p {
+	vertical-align: top;
+	display: inline-block;
+	font-weight: bold;
+	font-size: 14px;
+	padding-left: 20px;
+}
+.postImage {
+	display: block;
+	margin: auto;
+}
+.active:hover {
+	width: 853px;
+	cursor: hand;
+	cursor: pointer;
+}

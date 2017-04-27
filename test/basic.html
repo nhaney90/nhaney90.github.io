@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>SDK.com</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/common.css">
+	<link rel="stylesheet" href="css/postsCommon.css">
+	<link rel="stylesheet" href="css/basicPage/post.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="js/basicPage/eventHandlers.js"></script>
+	<script src="js/toolbarEventHandlers.js"></script>
+  </head>
+
+  <body>
+
+	<div class="jumbotron jumboConfig">
+		<h1 class="jumboHeader"></h1>
+		<h3 class="jumboTagLine"></h3>
+	</div>
+	
+	<nav role="navigation" class="navbar navbar-inverse navbarConfig">
+		<ul class="nav navbar-nav toolbarText navbar-left">
+			<li><a href="home.html">Home</a></li>
+			<li><a href="about.html">About</a></li>
+		</ul>
+	    <form role="search" class="navbar-nav navbar-form navbar-left">
+            <div class="form-group">
+            	<input type="text" placeholder="Search" class="form-control">
+				<a id="searchBtn" class="btn btn-outline-success my-2 my-sm-0" type="submit">Search All</a>
+        	</div>
+    	</form>
+		<ul class="nav navbar-nav toolbarText navbar-left" style="padding-left: 30px;">
+			<li><a id="oldestBtn">Oldest</a></li>
+			<li><a id="newestBtn">Newest</a></li>
+			<li class="post-btn" ><a id="postBtn" >Post</a></li>
+		</ul>
+		<ul class="nav navbar-nav toolbarText navbar-right" style="padding-right: 25px;">
+        	<li><a id="userLabel"></a></li>
+            <li><a id="logoutBtn">Logout</a></li>
+        </ul>
+    </nav>
+	
+	<div post-id="123" class="post-container">
+		<p class="post-topic" >How can I do this thing the customer wants to do?</p><p class="post-poster">-Jared C</p><br/>
+		<p>Tags:</p><p class="tags">ArcObjects</p><p>Posted:</p><p class="post-date">6/1/2017 11:07 AM</p><br/>
+	</div>
+	<div post-id="124" class="post-container">
+		<p class="post-topic" >How can I do this thing the customer wants to do?</p><p class="post-poster">-Jared C</p><br/>
+		<p>Tags:</p><p class="tags">ArcObjects DotNet Windows</p><p>Posted:</p><p class="post-date">6/1/2017 11:07 AM</p><br/>
+	</div>
+	
+	<div style="height:150px;"></div>
+    <footer class="text-muted navbar-fixed-bottom">
+		<div style="display:table; margin: 0 auto; text-align: center;">
+			<p>
+			  <a href="#">Back to top</a>
+			</p>
+			<p>If you have any questions about usage, click the "About" button on the top toolbar</p>
+			<p>Created by Nicholas Haney, copywrite 2017</p>
+		</div>
+    </footer>
+    <script>
+    </script>
+  </body>
+</html>

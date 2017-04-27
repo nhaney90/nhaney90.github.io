@@ -1,0 +1,16 @@
+.table {
+	background-color: white;
+	display: table;
+	margin: 0 auto;
+	width: 97%;
+}
+.tableHeader {
+	font-family: Courier New,Courier,Lucida Sans Typewriter,Lucida Typewriter,monospace;
+	font-size: 40px;
+	font-weight: bold;
+	display: table;
+	margin: 0 auto;
+	padding-top: 20px;
+	padding-bottom: 20px;
+	color: white;
+}

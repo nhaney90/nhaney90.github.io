@@ -1,0 +1,26 @@
+.post-container {
+	background-color: white;
+	width: 97%;
+	height: 40px;
+	display: table;
+	margin: 0 auto;
+	margin-top: 20px;
+	color: black;
+}
+.post-container p {
+	vertical-align: top;
+	display: inline-block;
+	font-weight: bold;
+	font-size: 14px;
+	padding-left: 20px;
+}
+.active:hover {
+	width: 98%;
+	height: 41px;
+	cursor: hand;
+	cursor: pointer;
+}
+.down {
+	width: 96% !important;
+	height: 39px !important;
+}

@@ -1,0 +1,34 @@
+.jumbotron {
+	padding-top: 6rem;
+	padding-bottom: 6rem;
+	margin-bottom: 0;
+	background-color: #fff;
+}
+.jumboConfig {
+	background-color: #317cd4;
+	height: 150px;
+	display: flex;
+}
+.jumboHeader {
+	color: white !important;
+	font-family: Courier New,Courier,Lucida Sans Typewriter,Lucida Typewriter,monospace;
+	font-weight: bolder;
+	font-size: 80px !important;
+	margin-top: 10px;
+	margin-left: 10px;
+}
+.jumboTagLine {
+	padding-top: 33px;
+	font-family: monospace;
+	font-size: 25px;
+	color: white;
+	margin-left: 100px;
+}
+footer {
+	padding-top: 3rem;
+	padding-bottom: 3rem;
+	background-color: white;
+}
+footer p {
+	margin-bottom: .25rem;
+}

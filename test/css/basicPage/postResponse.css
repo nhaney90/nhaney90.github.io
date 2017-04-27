@@ -1,0 +1,28 @@
+.post {
+	width: 97%;
+	background-color: white;
+	margin: 0 auto;
+}
+.post-container {
+	margin-top: 20px;
+}
+.post-container p {
+	vertical-align: top;
+	display: inline-block;
+	font-weight: bold;
+	font-size: 14px;
+	padding-left: 20px;
+}
+.post-body {
+	word-wrap: break-word;
+	border-top-style: solid;
+	margin-left: 20px;
+	margin-right: 20px;
+	padding-bottom: 20px;
+}
+.active:hover {
+	width: 98%;
+}
+.down {
+	width: 96% !important;
+}
