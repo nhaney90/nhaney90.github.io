@@ -125,8 +125,6 @@
 			let polylineJSON = {"paths":[[point1,point2]],"spatialReference":{"wkid":102100}};
 			let polyline = new Polyline(polylineJSON);
 			let length = geometryEngine.planarLength(polyline, unit);
-			console.log(length);
-			console.log(tolerances[unit]);
 			if(length < (distance + tolerances[unit])) {
 				let point = new Point(point2, map.spatialReference);
 				addPointToMap(point);
