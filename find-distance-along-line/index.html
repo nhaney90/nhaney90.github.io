@@ -3,7 +3,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
-	<title>Upload Shapefile to Portal</title>
+	<title>Find Distance Along Line</title>
 	<link rel="stylesheet" href="https://js.arcgis.com/3.21/esri/css/esri.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 	<style type="text/css">
@@ -125,6 +125,7 @@
 			let polylineJSON = {"paths":[[point1,point2]],"spatialReference":{"wkid":102100}};
 			let polyline = new Polyline(polylineJSON);
 			let length = geometryEngine.planarLength(polyline, unit);
+			console.log(length);
 			if(length < (distance + tolerances[unit])) {
 				let point = new Point(point2, map.spatialReference);
 				addPointToMap(point);
