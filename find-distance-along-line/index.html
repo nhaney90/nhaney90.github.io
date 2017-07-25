@@ -73,6 +73,7 @@
 	  ], function(Color, Graphic, Map, geometryEngine, Point, Polyline, SimpleLineSymbol, SimpleMarkerSymbol, GraphicsLayer) {
 	  
 		let lineGraphic = null;
+		let tolerances = {"feet":3,"yards":1,"miles":0.0005682,"meters":1.09361,"kilometers":0.0009144}
 	  
         const map = new Map("map", {
 			basemap: "topo",
@@ -97,7 +98,6 @@
 		
 		function findLengthOfLine(geometry, unit, distance) {
 			let length = geometryEngine.planarLength(geometry, unit);
-			console.log(length);
 			if(length < distance) {
 				alert("Invalid value! Length of Polyline is less than the specified length");
 			}
@@ -108,7 +108,6 @@
 		}
 		
 		function traverseLineSegments(geometry, unit, distance) {
-			console.log(unit);
 			let runningTotal = 0;
 			for(var i = 0; i < geometry.paths[0].length - 1; i++) {
 				let polylineJSON = {"paths":[[geometry.paths[0][i],geometry.paths[0][i +1]]],"spatialReference":{"wkid":102100}};
@@ -126,7 +125,7 @@
 			let polylineJSON = {"paths":[[point1,point2]],"spatialReference":{"wkid":102100}};
 			let polyline = new Polyline(polylineJSON);
 			let length = geometryEngine.planarLength(polyline, unit);
-			if(length < (distance + 6)) {
+			if(length < (distance + tolerances[unit])) {
 				let point = new Point(point2, map.spatialReference);
 				addPointToMap(point);
 			}
@@ -158,7 +157,7 @@
 		$("#splashScreen").fadeIn('slow');
 	
 		$(".btn-primary").click(function() {
-				$("#splashScreen").fadeOut('slow');
+			$("#splashScreen").fadeOut('slow');
 		});
 		
       });	
