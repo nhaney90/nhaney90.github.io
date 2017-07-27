@@ -100,6 +100,8 @@
 		}
 		
 		function addGraphicsToLayer(graphic) {
+			lineGraphic = new Graphic(graphic);
+			lineLayer.add(lineGraphic);
 			let startPointMarker = new Graphic(new Point([graphic.geometry.paths[0][0][0], graphic.geometry.paths[0][0][1]], map.spatialReference), startPointSymbol);
 			lineLayer.add(startPointMarker);
 			let startText = new Graphic(new Point([graphic.geometry.paths[0][0][0], graphic.geometry.paths[0][0][1]], map.spatialReference), startPointText);
@@ -108,8 +110,6 @@
 			lineLayer.add(endPointMarker);
 			let endText = new Graphic(new Point([graphic.geometry.paths[0][graphic.geometry.paths[0].length - 1][0], graphic.geometry.paths[0][graphic.geometry.paths[0].length - 1][1]], map.spatialReference), endPointText);
 			lineLayer.add(endText);
-			lineGraphic = new Graphic(graphic);
-			lineLayer.add(lineGraphic);
 		}
 		
 		function findLengthOfLine(geometry, unit, distance) {
