@@ -1,4 +1,4 @@
-define (["JS/Tile.js","JS/Player.js","JS/LB.js","JS/DT.js","JS/RDE.js","JS/LDE.js","JS/CB.js","JS/FS.js","JS/WR.js","JS/Utils/Enums.js","JS/Stats.js", "JS/Kickoffs.js", "JS/Database.js"], function(Tile, Player, LB, DT, RDE, LDE, CB, FS, WR, Enums, Stats, Kickoffs, Database) {
+define (["js/components/tile.js","js/tokens/player.js","js/tokens/lb.js","js/tokens/dt.js","js/tokens/rde.js","js/tokens/lde.js","js/tokens/cb.js","js/tokens/fs.js","js/tokens/wr.js","js/utils/enums.js","js/components/stats.js", "js/components/kickoffs.js", "js/components/database.js"], function(Tile, Player, LB, DT, RDE, LDE, CB, FS, WR, Enums, Stats, Kickoffs, Database) {
 	return class Game {
 		constructor(playerName) {
 			this.database = new Database();

@@ -1,4 +1,4 @@
-define (["JS/Ball.js", "JS/LB.js", "JS/Player.js", "JS/Utils/Enums.js"],function(Ball, LB, Player, Enums) {
+define (["js/tokens/ball.js", "js/tokens/lb.js", "js/tokens/player.js", "js/utils/enums.js"],function(Ball, LB, Player, Enums) {
 	return class Kickoffs {
 		constructor(game) {
 			this.game = game;

@@ -1,4 +1,4 @@
-define (["JS/Defender.js"],function(Defender) {
+define (["js/tokens/defender.js"],function(Defender) {
 	return class FS extends Defender {
 		constructor(tile) {
 			super();

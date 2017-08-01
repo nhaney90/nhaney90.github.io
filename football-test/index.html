@@ -1,152 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet" href="JS/ExternalLibs/bootstrap/css/bootstrap.min.css">
-<style>
-	#scoreBoard {
-		margin-left: 33px !important;
-		font-family: arial, sans-serif;
-		border-collapse: collapse;
-		width: 620px;
-		color: white;
-		background-color: black;
-		margin:10px;
-		font-weight: bold;
-	}
-
-	.cellStyling {
-		text-align: center !important;
-	}
-
-	.scoreValues {
-		font-size: 30px;
-		letter-spacing: 1.5px;
-		margin-top: -15px;
-	}
-	.scoreLabels {
-	}
-	.sidePanels {
-		width: 300px;
-		background-color: blue;
-		height: 400px;
-		margin-top: 60px;
-	}
-	.uiContainer {
-		display:flex;
-		margin:20px;
-	}
-	.sidePanelLabel {
-		margin: 10px;
-		font-size: 25px;
-		font-weight: bolder;
-		text-align: center;
-		color: white;
-	}
-	.sidePanelContainer {
-		background-color: white;
-		width: 300;
-		width: 260px;
-		margin: 20px;
-		height: 300px;
-		overflow: hidden;
-		overflow-y: scroll;
-	}
-	.column {
-		display:flex;
-		flex-direction:column;
-	}
-	.helpBtns{
-		margin: 10px;
-		font-size: 20px;
-	}
-	.headingStyle {
-		font-weight: bolder;
-	}
-
-	#tileContainer {
-		height: 100%;
-		width: 100%;
-		padding: 0px;
-		margin: 0px;
-	}
-	#showHighScoreBtn, #restartGameBtn{
-		position: absolute;
-		width: 280px;
-	}
-	.tile{
-		height: 67px;
-		width: 67px;
-		background-color: green;
-		color: white;
-		position: relative;
-		border: 1px solid #dddddd;
-	}
-	.token {
-		height: 100%;
-		width: 100%;
-		color: white;
-		top: 0px;
-		left: 0px;
-		position: absolute;
-	}
-	.player {
-		background-color: black;
-	}
-	.wr {
-		background-color: red;
-	}
-	.ball {
-		background-color: brown;
-		z-index: 100;
-	}
-	.defender {
-		background-color: blue;
-		z-index: 100;
-	}
-	.playByPlayHeading {
-		font-weight: bold;
-		padding: 5px;
-	}
-	.playByPlayItem {
-		margin-right: 5px;
-		text-indent: 1.5em;
-		padding-top: 5px;
-		padding-bottom: 5px;
-		font-size: 12px;
-	}
-	.blink {
-		animation:blink 400ms infinite alternate;
-	}
-	.boxscoreBoldHeadings {
-		font-weight:bolder;
-	}
-	.boxscoreHeadings {
-		text-indent:1em;
-	}
-	.roundedPanels {
-		-webkit-border-radius: 12px;
-		-moz-border-radius: 7px; 
-		-webkit-box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.4);
-		-moz-box-shadow: 0px 1px 6px rgba(23, 69, 88, .5);		
-	}
-	
-	@keyframes blink {
-    from { opacity:1; }
-    to { opacity:0; }
-};
-</style>
+<link rel="stylesheet" href="js/libs/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="css/style.css">
 <script src="https://www.gstatic.com/firebasejs/3.6.1/firebase.js"></script>
-<script src="JS/ExternalLibs/jquery-3.1.1.min.js"></script>
-<script src="JS/ExternalLibs/require.js"></script>
-<script src="JS/ExternalLibs/bootstrap/js/bootstrap.min.js"></script>
+<script src="js/libs/jquery-3.1.1.min.js"></script>
+<script src="js/libs/require.js"></script>
+<script src="js/libs/bootstrap/js/bootstrap.min.js"></script>
 	<script>
-
-		require(["JS/Game"],function(Game){
+		require(["js/game.js","js/utils/text.js"],function(Game, Text){
 			$("#playerNameModal").modal('show');
 			$("#restartGameBtn").click(function() {location.reload();});
 			$("#beginGameBtn").click(function(){
 				createGame($("#playerNameInput").val());
 			});
+			var keys = Object.keys(Text);
+			for(var key in keys) {
+				$("#" + keys[key]).text(Text[keys[key]]);
+			}
 			
 			function createGame(playerName) {
 				var game = new Game(playerName);
@@ -155,9 +26,7 @@
 				game.kickoffs.addKickoffTokens();
 				game.readUserInput();
 				game.database.initializeDatabase().then(function(response) {
-					game.database.getHighScores().then(function(scores) {
-						console.log(scores);
-					});
+					game.database.getHighScores();
 				});
 			}
 		});
@@ -580,27 +449,27 @@
 				<div class="panel panel-default">
 					<div class="panel-heading headingStyle">Goal of the Game</div>
 					<div class="panel-body">
-						<p>Text</p>
+						<p id="gameGoal"></p>
 					</div>
 					<div class="panel-heading headingStyle">Role of the Player</div>
 					<div class="panel-body">
-						<p>Text</p>
+						<p id="playerRole"></p>
 					</div>
 					<div class="panel-heading headingStyle">The Wide Receiver</div>
 					<div class="panel-body">
-						<p>Text</p>
+						<p id="receiverRole"></p>
 					</div>
 					<div class="panel-heading headingStyle">The Defenders</div>
 					<div class="panel-body">
-						<p>Text</p>
+						<p id="defenderRole"></p>
 					</div>
 					<div class="panel-heading headingStyle">The Gameclock</div>
 					<div class="panel-body">
-						<p>Text</p>
+						<p id="clockRole"></p>
 					</div>
 					<div class="panel-heading headingStyle">Scoring System</div>
 					<div class="panel-body">
-						<p>Text</p>
+						<p id="scoringSystem"></p>
 					</div>
 				</div>
 			 </div>

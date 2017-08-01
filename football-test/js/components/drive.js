@@ -2,7 +2,7 @@
 Class that represents a single drive. Also determines the outcome of a drive, keeps track of individual plays and determines the outcome of each play
 *****************************************************************************************************************************************************/
 
-define (["JS/Play.js", "JS/Utils/Enums.js"],function(Play, Enums) {
+define (["js/components/play.js", "js/utils/enums.js"],function(Play, Enums) {
 	return class Drive {
 		constructor(yardLine, clock) {
 			this.plays = [];

@@ -2,7 +2,7 @@
 Class used to manage game statistics, record the outcome of drives and set the game score
 *************************************************************************************************************************/
 
-define (["JS/Drive.js","JS/Play.js", "JS/Clock.js", "JS/Utils/Enums.js"],function(Drive, Play, Clock, Enums) {
+define (["js/components/drive.js","js/components/play.js", "js/components/clock.js", "js/utils/enums.js"],function(Drive, Play, Clock, Enums) {
 	return class Stats {
 		constructor(playerName) {
 			this.drives = [];

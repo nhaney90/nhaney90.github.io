@@ -1,4 +1,4 @@
-define (["JS/Token.js", "JS/Ball.js"],function(Token, Ball) {
+define (["js/tokens/token.js", "js/tokens/ball.js"],function(Token, Ball) {
 	return class Player extends Token {
 		constructor(tile) {
 			super();
