@@ -1,20 +1,4 @@
 To do list:
-1. Connect to Firebase to record high scores
-2. Commit high score of the week and all time high scores
-3. Show most yards, fewest points allowed, most points scored, biggest margin of victory
-4. Show longest pass, run and pickoff return
-5. Highest completion percentage, most interceptions thrown, most tds rushing, passing, longest field goal, most field goals made
-6. Show players a message for each record they set
-7. Allow the player to enter an alias for their high score
-8. Create a button showing high scores
-9. Query for scores with Firebase
-10. Show all high scores with the user who created them in a table within a modal dialog box
-11. Create kickoff logic
-12. The ball is kicked to the player at the beginning of every drive
-13. The ball is caught at a random location between -10 and 25. If the location is negative its a touchback.
-14. The player can then run the football. As the player is running defenders begin to appear every second at random.
-15. The drive then begins where the player is tackled
-16. Add kickoff animation
 17. Add fieldgoal animation
 18. Add sound effects for tackles, field goals, sacks, kickoffs, touchdowns and receptions
 19. Create SVG representation of goal posts and stadium steats
