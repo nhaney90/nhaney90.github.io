@@ -1,6 +1,0 @@
-To do list:
-17. Add fieldgoal animation
-18. Add sound effects for tackles, field goals, sacks, kickoffs, touchdowns and receptions
-19. Create SVG representation of goal posts and stadium steats
-20. Update colors and fonts
-21. Add touchdown banner and message
