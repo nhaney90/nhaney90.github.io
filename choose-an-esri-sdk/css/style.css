@@ -1,0 +1,94 @@
+html,body,#viewDiv {
+	padding: 0;
+	margin: 0;
+	height: 100%;
+	width: 100%;
+	background-color: #060606;
+	color: #fff;
+	font-family:Tahoma, Geneva, sans-serif;
+}
+.background-mask {
+	top: 0px;
+	left: 0px;
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	background-color: #fff;
+	z-index: 100;
+	opacity: 0.6;
+}
+.btn {
+	width: 250px;
+	margin-bottom: 15px;
+	display: table;
+}
+.button-panel {
+	top: 85px;
+	margin-left: auto;
+	margin-right: auto;
+}
+.column-font {
+	font-size: 20px;
+	padding-right: 15px;
+	padding-left: 15px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 20px;
+	display: table;
+}
+.features {
+	margin: 15px;
+}
+.flex-box {
+	display: flex;
+	height: 90%;
+	top: 0px;
+	flex-grow: 1;
+}
+.flex-column {
+	display: flex;
+	flex-direction: column;
+	width: 500px;
+}
+.jumbotron {
+	background-color: rgb(72, 85, 102);
+	color: white;
+	text-align: center;
+}
+.key-features {
+	margin-left: auto;
+	margin-right: auto;
+	display:table;
+	font-weight: bold;
+	padding-bottom: 20px;
+	padding-top: 20px;
+}
+.link-to-docs {
+	padding-top: 10px;
+}
+.navbar-brand {
+	font-size: 26px;
+	padding-top: 30px;
+}
+.product-info {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+	font-size: 18px;
+}
+.splash-screen {
+	display: none;
+	top: 15%;
+	position: absolute;
+	z-index: 200;
+	left: 0;
+	right: 0;
+	width: 80%;
+	margin: 0 auto;
+}
+.splash-button {
+	width: 100px;
+	display: inline-block;
+}

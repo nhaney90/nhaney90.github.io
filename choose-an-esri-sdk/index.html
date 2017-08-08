@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+	<title>Choose an Esri SDK</title>
+	
+  	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://js.arcgis.com/4.4/esri/css/main.css">
+	<link rel="stylesheet" href="css/style.css">
+
+  	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+	<script src="https://js.arcgis.com/4.4/"></script>
+	<script src="js/main.js"></script>
+	</script>
+</head>
+<body>
+	<div class="background-mask"></div>
+	<div class="nav-container">
+		<nav class = "navbar" role = "navigation">
+			<div class = "navbar-header">
+				<p class = "navbar-brand">Which Esri SDK Should I Use?</p>
+			</div>
+		</nav>
+	</div>
+	<div class = "flex-box">
+		<div id="viewDiv"></div>
+		<div id="sidePanel" class = "flex-column">
+			<div id="questionDiv" class="column-font"></div>
+			<div class="button-panel">
+				<button id="yesBtn" class="btn btn-default">Yes</button>
+				<button id="noBtn" class="btn btn-default">No</button>
+				<button id="backBtn" class="btn btn-default">Back</button>
+				<button id="resetBtn" class="btn btn-danger">Start Over</button>
+			</div>
+			<div id="productInfo" class="product-info"></div>
+		</div>
+	</div>
+	<div id="splashScreen" class="splash-screen">
+		<div class = "jumbotron">
+			<h1>Which Esri SDK Should I Use?</h1>
+			<p>By answering a series or yes or no questions about the project you are planning, this guide will help you choose the Esri SDK that most fits your needs. You will learn more about the different types of software Esri has to offer and will get a tour of downtown Charlotte!</p>
+			<p><a class = "btn btn-primary btn-lg splash-button" role = "button">Got It!</a></p>
+		</div>
+    </div>
+</body>
+</html>
