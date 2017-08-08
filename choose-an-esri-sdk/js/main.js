@@ -3,11 +3,12 @@ require([
 	"esri/Map",
 	"esri/layers/FeatureLayer",
 	"esri/layers/GraphicsLayer",
+	"esri/layers/MapImageLayer",
 	"esri/layers/TileLayer",
 	"esri/symbols/SimpleMarkerSymbol",
 	"esri/views/MapView",
 	"dojo/domReady!"
-], function(Graphic, Map, FeatureLayer, GraphicsLayer, TileLayer,SimpleMarkerSymbol, MapView) {
+], function(Graphic, Map, FeatureLayer, GraphicsLayer, MapImageLayer, TileLayer,SimpleMarkerSymbol, MapView) {
 
 	let map = new Map({
 		ground: "world-elevation"
@@ -37,10 +38,14 @@ require([
 	let connectorsLayer = new FeatureLayer({
 		url: "https://services.arcgis.com/Wl7Y1m92PbjtJs5n/arcgis/rest/services/SDKFlowChart/FeatureServer/3"
 	});
+	
+	let labelLayer = new MapImageLayer({
+		url: "http://csc-nhaney7d.esri.com/arcgis/rest/services/FlowchartLabels/MapServer"
+	});
 			
 	let graphicsLayer = new GraphicsLayer();
 
-	map.addMany([basemap, connectorsLayer, flowchartLayer, graphicsLayer]);
+	map.addMany([basemap, labelLayer, connectorsLayer, flowchartLayer, graphicsLayer]);
 	
 	let query = flowchartLayer.createQuery();
 			
