@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html dir="ltr">
+
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no" />
+   <title>ArcGIS API for JavaScript | Customize Search widget</title>
+   <link rel="stylesheet" href="https://js.arcgis.com/3.21/dijit/themes/claro/claro.css">
+   <link rel="stylesheet" href="https://js.arcgis.com/3.21/esri/css/esri.css">
+   <style>
+      html,
+      body,
+      #map,
+      .map.container {
+         padding: 0;
+         margin: 0;
+         height: 100%;
+         width: 100%;
+      }
+      #info {
+         top: 2px;
+         color: #444;
+         height: auto;
+         font-family: arial;
+         font-weight: bold;
+         left: 69px;
+         margin: 5px;
+         padding: 10px;
+         position: absolute;
+         width: 260px;
+         z-index: 40;
+         border: solid 1px #003300;
+         border-radius: 4px;
+         background-color: #E5E5E5;
+      }
+      #search {
+         display: block;
+         position: absolute;
+         z-index: 2;
+         top: 50px;
+         left: 74px;
+      }
+      /*Beginning of search box modifications*/
+      .arcgisSearch .searchClear {
+         background-color: #E5E5E5;
+      }
+      .arcgisSearch .esriIconZoom {
+         background-image: url("finding.png");
+         background-size: 20px 20px;
+      }
+      .esriIconZoom:before {
+         content: "";
+      }
+      .arcgisSearch .searchGroup .searchInput,
+      .arcgisSearch .searchBtn,
+      .arcgisSearch .noResultsMenu,
+      .arcgisSearch .suggestionsMenu {
+         border: 1px solid #003300;
+         background-color: #E5E5E5;
+      }
+      .arcgisSearch .noValueText {
+         color: red;
+         font-size: 14px;
+      }
+      /*Beginning of popup modifications*/
+      .esriPopup .titlePane {
+         background-color: #003300;
+         border-bottom: 1px solid #121310;
+         font-weight: bold;
+      }
+      .esriPopup a {
+         color: #DAE896;
+      }
+      .esriPopup .contentPane,
+      .esriPopup .actionsPane,
+      .esriPopup .pointer,
+      .esriPopup .outerPointer {
+         background-color: #B3B3B3;
+      }
+	  .arcgisSearch .searchGroup .searchInput {
+		width: 250px !important;
+	  }
+	  .arcgisSearch .searchMenu li {
+		padding: 0px;
+		margin-left: 5px;
+		min-height: 50px;
+	  }
+	  .myCustomIconClass1 {
+		background-position: left center;
+		background-repeat: no-repeat;
+		padding-left: 55px !important;
+		background-size: 50px;
+	  }
+   </style>
+
+   <script src="https://js.arcgis.com/3.21/"></script>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+   <script>
+      var map;
+
+      require([
+		  "esri/map",
+		  "esri/graphic",
+		  "esri/Color",
+		  "esri/InfoTemplate",
+		  "esri/tasks/locator",
+		  "esri/tasks/query",
+		  "esri/tasks/QueryTask",
+		  "esri/layers/GraphicsLayer",
+		  "esri/geometry/geometryEngine",
+		  "esri/dijit/Search",
+		  "esri/InfoTemplate",
+		  "esri/symbols/SimpleLineSymbol",
+		  "esri/symbols/SimpleMarkerSymbol",
+		  "esri/symbols/SimpleFillSymbol",
+		  "http://csc-nhaney7d.esri.com/CountryCodes.js",
+		  "dojo/domReady!"
+      ], function (Map, Graphic, Color, infoTemplate, Locator, Query, QueryTask, GraphicsLayer, GeometryEngine, Search, InfoTemplate, SimpleLineSymbol, SimpleMarkerSymbol, SimpleFillSymbol, CountryCodes) {
+	  
+		var infoTemplate = new InfoTemplate();
+		infoTemplate.setTitle("Title");
+		infoTemplate.setContent("<button id='performBufferButton'>Buffer Point</button>");
+		
+		var countryCodes = new CountryCodes();
+
+        map = new Map("map", {
+            basemap: "topo",
+            center: [0, 51],
+            zoom: 4
+        });
+
+         var search = new Search({
+            map: map,
+            zoomScale: 5000000
+         }, "search");
+		 
+		 var graphicsLayer = new GraphicsLayer();
+		 map.addLayer(graphicsLayer);
+		 
+         search.startup();
+		 
+		 search.on("suggest-results", async (result) => {
+			var elements = $('ul[role="menu"]').children();
+			for(var i = 0; i < elements.length; i++) {
+				var parsedResult = result.results[0][i].text.split(',');
+				var threeDigitCode = parsedResult[parsedResult.length - 1].trim();
+				var twoDigitCode = countryCodes.getTwoDigitCode(threeDigitCode);
+				if(twoDigitCode) {
+					var flagSVG = countryCodes.getFlagSVG(twoDigitCode);
+					$( "ul[role='menu'] li:nth-child(" + (i + 1) + ")" ).addClass("myCustomIconClass1");
+					$( "ul[role='menu'] li:nth-child(" + (i + 1)  + ")" ).css("background-image", "url(" + flagSVG + ")");
+				}
+			}
+		 });
+		 
+		 search.on("select-result", function(result) {
+			$("#performBufferButton").click(function() {
+				createBuffer(map.infoWindow.features[0]);
+			});
+		 });
+      });
+   </script>
+</head>
+
+<body>
+   <div id="search"></div>
+   <div id="map"></div>
+</body>
+
+</html>
