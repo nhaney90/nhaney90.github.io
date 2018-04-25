@@ -1,0 +1,39 @@
+<div id="searchContainer">
+      <div class="container">
+        <ul class="nav nav-tabs" role="tablist">
+			       <li class="nav-item">
+               <a  id="name-tab" class="nav-link active" data-toggle="tab" role="tab" aria-controls="name-pane" aria-selected="true" href="#name-pane">Name</a>
+			       </li>
+			       <li class="nav-item">
+               <a id="org-tab" class="nav-link" data-toggle="tab" role="tab" aria-controls="org-pane" aria-selected="false" href="#org-pane">Organization</a>
+			       </li>
+			       <li class="nav-item">
+               <a id="inscript-tab" class="nav-link" data-toggle="tab" role="tab" aria-controls="inscript-pane" aria-selected="false" href="#inscript-pane">Inscription</a>
+			       </li>
+		     </ul>
+         <div class="tab-content">
+   			  <div class="tab-pane fade show active" id="name-pane" role="tabpanel" aria-labelledby="name-tab">
+            <input type="text" class="typeahead" id="fullNameSearch" placeholder="Type a person's name">
+            <button id="nameSearchBtn" type="submit" class="btn btn-primary esri-icon-search search-btn"></button>
+   				</div>
+   				<div class="tab-pane fade" id="org-pane" role="tabpanel" aria-labelledby="org-tab">
+            <input type="text" class="typeahead" id="orgNameSearch" placeholder="Type an organization's name">
+            <button id="orgSearchBtn" type="submit" class="btn btn-primary esri-icon-search search-btn"></button>
+   				</div>
+          <div class="tab-pane fade" id="inscript-pane" role="tabpanel" aria-labelledby="inscript-tab">
+             <input type="text" class="typeahead" id="inscriptSearch" placeholder="Type a word from the inscription" style="width:calc(100% - 43px);">
+             <button id="inscriptSearchBtn" type="submit" class="btn btn-primary esri-icon-search search-btn"></button>
+   				</div>
+   			</div>
+      </div>
+      <table class="table table-hover">
+        <thead>
+          <tr id="tableColumns">
+            <th scope="col" style="border">Name</th>
+            <th scope="col">Inscription</th>
+          </tr>
+        </thead>
+        <tbody id="searchResultsTable">
+        </tbody>
+      </table>
+</div>
